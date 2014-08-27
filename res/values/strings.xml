@@ -2,6 +2,9 @@
 <resources>
 
     <string name="app_name">Загадки для детей - отгадываем играя</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="a0_simpleBtn">Простая игра</string>
+    <string name="a0_variantsBtn">С выбором ответа</string>
+    <string name="a0_countdownBtn">Обратный отсчёт</string>
+    <string name="a0_sandsBtn">Пески времени</string>
 
 </resources>
