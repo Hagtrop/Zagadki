@@ -16,5 +16,8 @@ public class MainActivity extends Activity {
         variantsBtn = (Button) findViewById(R.id.a0_variantsBtn);
         countdownBtn = (Button) findViewById(R.id.a0_countdownBtn);
         sandsBtn = (Button) findViewById(R.id.a0_sandsBtn);
+        
+        BaseHelper bh = new BaseHelper(this);
+        bh.printData();
     }
 }
