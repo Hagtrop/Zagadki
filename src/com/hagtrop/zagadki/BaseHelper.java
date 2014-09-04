@@ -1,6 +1,5 @@
 package com.hagtrop.zagadki;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +19,15 @@ public class BaseHelper extends SQLiteOpenHelper {
 	public BaseHelper(Context context) {
 		super(context, BASE_NAME, null, 1);
 		mContext = context;
+		copyBaseFromAssets();
+		Log.d("mLog", "Записи скопированы");
+		SQLiteDatabase db = getReadableDatabase();
+		db.close();
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
