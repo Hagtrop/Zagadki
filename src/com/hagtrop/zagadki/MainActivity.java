@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
         countdownBtn = (Button) findViewById(R.id.a0_countdownBtn);
         sandsBtn = (Button) findViewById(R.id.a0_sandsBtn);
         
-        BaseHelper bh = new BaseHelper(this);
+        BaseHelper bh = BaseHelper.getInstance(this);
         bh.printData();
         SQLiteDatabase db = bh.getWritableDatabase();
         Cursor cursor = db.query("questions", null, null, null, null, null, null);
