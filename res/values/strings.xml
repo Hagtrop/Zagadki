@@ -6,5 +6,6 @@
     <string name="a0_variantsBtn">С выбором ответа</string>
     <string name="a0_countdownBtn">Обратный отсчёт</string>
     <string name="a0_sandsBtn">Пески времени</string>
+    <string name="a1_questionTV">Текст загадки</string>
 
 </resources>
