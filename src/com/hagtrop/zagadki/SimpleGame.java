@@ -25,6 +25,7 @@ public class SimpleGame extends Activity {
         String question = cursor.getString(1);
         question = question.replace("\\n", System.getProperty("line.separator"));
         cursor.close();
+        db.close();
         questionTV.setText(question);
 	}
 }
