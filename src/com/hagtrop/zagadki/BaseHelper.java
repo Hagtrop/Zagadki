@@ -54,6 +54,16 @@ public class BaseHelper extends SQLiteOpenHelper {
 
 	}
 	
+	public void newSimpleGame(){
+		String deleteQuery, createQuery;
+		deleteQuery = "DROP TABLE IF EXISTS simple_game";
+		createQuery = "CREATE TABLE simple_game(id INTEGER, question_id INTEGER, status INTEGER DEFAULT 0)";
+		SQLiteDatabase database = getWritableDatabase();
+		database.execSQL(deleteQuery);
+		database.execSQL(createQuery);
+		database.close();
+	}
+	
 	public void printData(){
 		Log.d("mLog", "BaseName=" + getDatabaseName());
 		Log.d("mLog", "BaseFile=" + mContext.getDatabasePath(getDatabaseName()));
