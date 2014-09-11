@@ -19,6 +19,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 	private static final String BASE_NAME = "zagadkiDB";
 	private static File BASE_FILE;
 	private static BaseHelper bhInstance;
+	private boolean simpleGameExists = false;
 	
 	synchronized static public BaseHelper getInstance(Context context){
 		Log.d("mLog", "BaseHelper getInstance");
@@ -62,6 +63,11 @@ public class BaseHelper extends SQLiteOpenHelper {
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);
 		database.close();
+		simpleGameExists = true;
+	}
+	
+	public boolean simpleGameExists(){
+		return simpleGameExists;
 	}
 	
 	public void printData(){
