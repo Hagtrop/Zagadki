@@ -17,8 +17,10 @@ import android.widget.TextView;
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor> {
 	TextView questionTV;
 	private static final Uri QUESTIONS_URI = Uri.parse("content://com.hagtrop.zagadki.zagadkiDB/questions");
+	private static final String TABLE_NAME = "questions";
 	private static final int ARRAY_LOADER = 0;
-	private ArrayList<QueParams> quesOrder;
+	private ArrayList<QueParams> quesParams;
+	private SQLiteDatabase database;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +38,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		}
 		else{
 			baseHelper.newSimpleGame();
-			Log.d("mLog", "STEP: getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this)");
-			getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this);
+			Log.d("mLog", "STEP: getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this)");	
 		}
-		
-		/*BaseHelper bh = BaseHelper.getInstance(this);
-        SQLiteDatabase db = bh.getWritableDatabase();
-        Cursor cursor = db.query("questions", null, null, null, null, null, null);
-        cursor.moveToFirst();
-        String question = cursor.getString(1);
-        question = question.replace("\\n", System.getProperty("line.separator"));
-        cursor.close();
-        db.close();
-        questionTV.setText(question);*/
+		database = baseHelper.getWritableDatabase();
+		getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this);
 	}
 
 	@Override
@@ -56,8 +49,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		// TODO Auto-generated method stub
 		switch(loaderID){
 		case ARRAY_LOADER:
-			Log.d("mLog", "STEP: case ARRAY_LOADER");
-			return new CursorLoader(this, QUESTIONS_URI, new String[]{"_id", "level", "answer_id"}, null, null, null);
+			return new MyCursorLoader(this, database, TABLE_NAME, new String[]{"_id", "level", "answer_id"}, null, null, null);
 		default: return null;
 		}
 	}
@@ -65,12 +57,23 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		// TODO Auto-generated method stub
-		cursor.moveToFirst();
-        String id = cursor.getString(0);
-        String level = cursor.getString(1);
-        String answerId = cursor.getString(2);
-        questionTV.setText("Id=" + id);
-        cursor.close();
+		switch(loader.getId()){
+		case ARRAY_LOADER:
+			if(cursor.moveToFirst()){
+				quesParams = new ArrayList<QueParams>();
+				int queId, queLevel, answerId;
+				do{
+					queId = cursor.getInt(cursor.getColumnIndex("_id"));
+			        queLevel = cursor.getInt(cursor.getColumnIndex("level"));
+			        answerId = cursor.getInt(cursor.getColumnIndex("answer_id"));
+			        quesParams.add(new QueParams(queId, queLevel, answerId));
+				} while(cursor.moveToNext());
+			}
+			cursor.close();
+			printArray(quesParams);
+			break;
+		default: break;
+		}
 	}
 
 	@Override
@@ -78,16 +81,22 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private void printArray(ArrayList<QueParams> mArray){
+		for(QueParams mParams : mArray){
+			Log.d("mLog", "queId=" + mParams.queId + " queLevel=" + mParams.queLevel + " answerId=" + mParams.answerId);
+		}
+	}
 }
 
 class QueParams{
 	public final int queId;
-	public final int queLvel;
+	public final int queLevel;
 	public final int answerId;
 	
-	public QueParams(int queId, int queLvel, int answerId){
+	public QueParams(int queId, int queLevel, int answerId){
 		this.queId = queId;
-		this.queLvel = queLvel;
+		this.queLevel = queLevel;
 		this.answerId = answerId;
 	}
 }
