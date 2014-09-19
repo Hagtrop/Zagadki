@@ -10,6 +10,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/a1_questionTV" />
+        android:hint="@string/a1_questionTV" />
+
+    <TextView
+        android:id="@+id/a1_answerTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/a1_answerTV" />
+
+    <Button
+        android:id="@+id/a1_nextBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/a1_nextBtn" />
 
 </LinearLayout>
