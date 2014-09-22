@@ -15,11 +15,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener {
 	TextView questionTV, answerTV;
 	Button nextBtn;
+	LinearLayout answerLayout;
 	
 	private static final int ARRAY_LOADER = 0;
 	private static final int QUESTION_LOADER = 1;
@@ -37,6 +39,11 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
 		nextBtn.setOnClickListener(this);
+		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
+		Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
+		btnA.setText("A");
+		
+		answerLayout.addView(btnA);
 				
 		BaseHelper baseHelper = BaseHelper.getInstance(this);
 		
