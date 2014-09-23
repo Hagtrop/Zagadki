@@ -28,6 +28,9 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private ArrayList<QueParams> quesParams;
 	private SQLiteDatabase database;
 	private int currentQueIndex = 0;
+	private ArrayList<Button> answerBtns;
+	private String question, answer;
+	char[] answerLetters;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +43,11 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
 		nextBtn.setOnClickListener(this);
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
-		Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
-		btnA.setText("A");
 		
-		answerLayout.addView(btnA);
+		//Создаём кнопку со своим стилем
+		//Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
+		
+		
 				
 		BaseHelper baseHelper = BaseHelper.getInstance(this);
 		
@@ -75,8 +79,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		// TODO Auto-generated method stub
 		switch(loader.getId()){
+		//Сохраняем в ArrayList параметры и характеристики вопросов для дальнейшей сортировки
 		case ARRAY_LOADER:
 			if(cursor.moveToFirst()){
 				quesParams = new ArrayList<QueParams>();
@@ -91,20 +95,32 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			printArray(quesParams);
 			loadQuestion(quesParams.get(0).queId);
 			break;
+		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
 			if(cursor.moveToFirst()){
-				String question, answer;
+				answerBtns = new ArrayList<Button>();
 				question = cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n");
 				answer = cursor.getString(cursor.getColumnIndex("answer"));
+				answer = answer.trim();
 				Log.d("mLog", question);
 				Log.d("mLog", answer);
 				questionTV.setText(question);
 				answerTV.setText(answer);
 				Log.d("mLog", "QUESTION_LOADER");
+				answerLetters = answer.toCharArray();
+				answerLayout.removeAllViews();
+				answerBtns.clear();
+				for(int i=0; i<answerLetters.length; i++){
+					Button letterBtn = new Button(this);
+					letterBtn.setMinimumWidth(10);
+					letterBtn.setWidth(10);
+					letterBtn.setMaxWidth(10);
+					answerLayout.addView(letterBtn);
+					answerBtns.add(letterBtn);
+				}
 			}
 		default: break;
 		}
-		//if(cursor != null) cursor.close();
 	}
 	
 	private void loadQuestion(int queId){
