@@ -31,6 +31,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private ArrayList<Button> answerBtns;
 	private String question, answer;
 	char[] answerLetters;
+	private static final char[] RUS_ALPHABET = new char[]{'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', '¨', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', '×', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'Þ', 'ß'};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
