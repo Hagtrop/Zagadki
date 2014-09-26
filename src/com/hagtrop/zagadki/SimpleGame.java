@@ -28,7 +28,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private ArrayList<QueParams> quesParams;
 	private SQLiteDatabase database;
 	private int currentQueIndex = 0;
-	private ArrayList<Button> answerBtns;
+	private ArrayList<Button> answerBtns, lettersBtns;
 	private String question, answer;
 	char[] answerLetters;
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
@@ -44,6 +44,35 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
 		nextBtn.setOnClickListener(this);
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
+		
+		answerBtns = new ArrayList<Button>();
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn1));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn2));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn3));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn4));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn5));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn6));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn7));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn8));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn9));
+		answerBtns.add((Button) findViewById(R.id.a1_answerBtn10));
+		
+		lettersBtns = new ArrayList<Button>();
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn1));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn2));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn3));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn4));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn5));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn6));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn7));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn8));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn9));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn10));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn11));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn12));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn13));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn14));
+		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn15));
 		
 		//Создаём кнопку со своим стилем
 		//Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
@@ -99,7 +128,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
 			if(cursor.moveToFirst()){
-				answerBtns = new ArrayList<Button>();
 				question = cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n");
 				answer = cursor.getString(cursor.getColumnIndex("answer"));
 				answer = answer.trim();
@@ -109,16 +137,24 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				answerTV.setText(answer);
 				Log.d("mLog", "QUESTION_LOADER");
 				answerLetters = answer.toCharArray();
-				answerLayout.removeAllViews();
-				answerBtns.clear();
-				for(int i=0; i<answerLetters.length; i++){
+				for(int i=0; i<answerBtns.size(); i++){
+					Button btn = answerBtns.get(i);
+					if(i < answerLetters.length)
+						btn.setVisibility(View.VISIBLE);
+					else
+						btn.setVisibility(View.GONE);
+				}
+				//answerLayout.removeAllViews();
+				//answerBtns.clear();
+				/*for(int i=0; i<answerLetters.length; i++){
 					Button letterBtn = new Button(this);
 					letterBtn.setMinimumWidth(10);
 					letterBtn.setWidth(10);
 					letterBtn.setMaxWidth(10);
 					answerLayout.addView(letterBtn);
 					answerBtns.add(letterBtn);
-				}
+					
+				}*/
 			}
 		default: break;
 		}

@@ -94,27 +94,115 @@
         <TableRow
             android:id="@+id/tableRow1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <Button
+                android:id="@+id/a1_letterBtn1"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn2"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn3"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn4"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn5"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <Button
+                android:id="@+id/a1_letterBtn6"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn7"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn8"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn9"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn10"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
 
-        <TableRow
-            android:id="@+id/tableRow4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            <Button
+                android:id="@+id/a1_letterBtn11"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn12"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn13"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn14"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/a1_letterBtn15"
+                style="@style/AnswerLetterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </TableRow>
     </TableLayout>
 
