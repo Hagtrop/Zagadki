@@ -1,6 +1,8 @@
 package com.hagtrop.zagadki;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Random;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -32,6 +34,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private String question, answer;
 	char[] answerLetters;
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
+	private Random random = new Random();
+	private int focusBtnNum = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		nextBtn.setOnClickListener(this);
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
 		
+		//Объединяем в массив пустые кнопки ответа
 		answerBtns = new ArrayList<Button>();
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn1));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn2));
@@ -57,6 +62,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn9));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn10));
 		
+		//Объединяем в массив кнопки с буквами
 		lettersBtns = new ArrayList<Button>();
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn1));
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn2));
@@ -73,6 +79,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn13));
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn14));
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn15));
+		LettersOnClickListener lettersOnClickListener = new LettersOnClickListener();
+		for(Button btn : lettersBtns) btn.setOnClickListener(lettersOnClickListener);
 		
 		//Создаём кнопку со своим стилем
 		//Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
@@ -130,7 +138,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			if(cursor.moveToFirst()){
 				question = cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n");
 				answer = cursor.getString(cursor.getColumnIndex("answer"));
-				answer = answer.trim();
+				answer = answer.trim().toUpperCase(new Locale("ru"));
 				Log.d("mLog", question);
 				Log.d("mLog", answer);
 				questionTV.setText(question);
@@ -144,6 +152,33 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 					else
 						btn.setVisibility(View.GONE);
 				}
+				
+				//Создаём массив вариантов букв
+				char[] allLetters = new char[15];
+				System.arraycopy(answerLetters, 0, allLetters, 0, answerLetters.length);
+				for(int i=answerLetters.length; i < allLetters.length; i++){
+					char letter = RUS_ALPHABET[random.nextInt(33)];
+					allLetters[i] = letter;
+				}
+				//Перемешиваем массив букв
+				ArrayShuffle.reshuffle(allLetters);
+				//Выводим буквы на кнопки
+				for(int i=0; i<lettersBtns.size(); i++){
+					lettersBtns.get(i).setText(String.valueOf(allLetters[i]));
+				}
+				
+				//Возвращаем нажатые кнопки
+				for(Button btn : lettersBtns){
+					btn.setVisibility(View.VISIBLE);
+				}
+				//Очищаем кнопки ответа
+				for(Button btn : answerBtns){
+					btn.setText(null);
+				}
+				
+				//Устанавливаем фокус в позицию 0
+				focusBtnNum = 0;
+				
 				//answerLayout.removeAllViews();
 				//answerBtns.clear();
 				/*for(int i=0; i<answerLetters.length; i++){
@@ -187,6 +222,19 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			Log.d("mLog", "currentQueIndex=" + currentQueIndex);
 		}
 	}
+	
+	class LettersOnClickListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			Button btn = (Button) v;
+			btn.setVisibility(View.INVISIBLE);
+			answerBtns.get(focusBtnNum).setText(btn.getText());
+			if(focusBtnNum < answerLetters.length-1) focusBtnNum++;
+		}
+		
+	}
 }
 
 class QueParams{
@@ -198,5 +246,20 @@ class QueParams{
 		this.queId = queId;
 		this.queLevel = queLevel;
 		this.answerId = answerId;
+	}
+}
+
+class ArrayShuffle{
+	static void reshuffle(char[] array){
+		Random random = new Random();
+		for(int i=array.length-1; i>0; i--){
+			int j = random.nextInt(i+1);
+			swap(array, i, j);
+		}
+	}
+	private static void swap(char[] array, int i, int j){
+		char temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
 	}
 }
