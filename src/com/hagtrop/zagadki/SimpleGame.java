@@ -30,9 +30,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private ArrayList<QueParams> quesParams;
 	private SQLiteDatabase database;
 	private int currentQueIndex = 0;
-	private ArrayList<Button> answerBtns, lettersBtns;
+	private ArrayList<Button> lettersBtns;
+	private AnswerButtonsArray answerBtns;
 	private String question, answer;
-	char[] answerLetters;
+	private char[] answerLetters;
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
 	private int focusBtnNum = 0;
@@ -50,7 +51,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
 		
 		//Объединяем в массив пустые кнопки ответа
-		answerBtns = new ArrayList<Button>();
+		answerBtns = new AnswerButtonsArray();
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn1));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn2));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn3));
@@ -145,13 +146,15 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				answerTV.setText(answer);
 				Log.d("mLog", "QUESTION_LOADER");
 				answerLetters = answer.toCharArray();
-				for(int i=0; i<answerBtns.size(); i++){
+				answerBtns.setVisible(answerLetters.length);
+				
+				/*for(int i=0; i<answerBtns.size(); i++){
 					Button btn = answerBtns.get(i);
 					if(i < answerLetters.length)
 						btn.setVisibility(View.VISIBLE);
 					else
 						btn.setVisibility(View.GONE);
-				}
+				}*/
 				
 				//Создаём массив вариантов букв
 				char[] allLetters = new char[15];
@@ -172,24 +175,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 					btn.setVisibility(View.VISIBLE);
 				}
 				//Очищаем кнопки ответа
-				for(Button btn : answerBtns){
-					btn.setText(null);
-				}
+				answerBtns.clearText();
 				
 				//Устанавливаем фокус в позицию 0
 				focusBtnNum = 0;
-				
-				//answerLayout.removeAllViews();
-				//answerBtns.clear();
-				/*for(int i=0; i<answerLetters.length; i++){
-					Button letterBtn = new Button(this);
-					letterBtn.setMinimumWidth(10);
-					letterBtn.setWidth(10);
-					letterBtn.setMaxWidth(10);
-					answerLayout.addView(letterBtn);
-					answerBtns.add(letterBtn);
-					
-				}*/
 			}
 		default: break;
 		}
@@ -230,7 +219,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			// TODO Auto-generated method stub
 			Button btn = (Button) v;
 			btn.setVisibility(View.INVISIBLE);
-			answerBtns.get(focusBtnNum).setText(btn.getText());
+			//answerBtns.get(focusBtnNum).setText(btn.getText());
+			answerBtns.setLetter(focusBtnNum, btn);
 			if(focusBtnNum < answerLetters.length-1) focusBtnNum++;
 		}
 		
@@ -261,5 +251,42 @@ class ArrayShuffle{
 		char temp = array[i];
 		array[i] = array[j];
 		array[j] = temp;
+	}
+}
+
+class AnswerButtonsArray{
+	private ArrayList<Button> buttons;
+	private Button[] letters;
+	
+	public AnswerButtonsArray(){
+		buttons = new ArrayList<Button>();
+	}
+	
+	void add(Button button){
+		buttons.add(button);
+	}
+	
+	void setLetter(int position, Button letter){
+		//letters.set(position, letter);
+		letters[position] = letter;
+		buttons.get(position).setText(letter.getText());
+	}
+	
+	int size(){
+		return buttons.size();
+	}
+	
+	void setVisible(int count){
+		for(int i=0; i<count; i++){
+			buttons.get(i).setVisibility(View.VISIBLE);
+			letters = new Button[count];
+		}
+		for(int i=count; i<buttons.size(); i++) buttons.get(i).setVisibility(View.GONE);
+	}
+	
+	void clearText(){
+		for(Button button : buttons){
+			button.setText(null);
+		}
 	}
 }
