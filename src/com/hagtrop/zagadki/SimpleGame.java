@@ -1,6 +1,7 @@
 package com.hagtrop.zagadki;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
@@ -62,6 +63,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn8));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn9));
 		answerBtns.add((Button) findViewById(R.id.a1_answerBtn10));
+		answerBtns.setOnClickListener(new AnswerLettersOnClickListener());
 		
 		//Объединяем в массив кнопки с буквами
 		lettersBtns = new ArrayList<Button>();
@@ -148,14 +150,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				answerLetters = answer.toCharArray();
 				answerBtns.setVisible(answerLetters.length);
 				
-				/*for(int i=0; i<answerBtns.size(); i++){
-					Button btn = answerBtns.get(i);
-					if(i < answerLetters.length)
-						btn.setVisibility(View.VISIBLE);
-					else
-						btn.setVisibility(View.GONE);
-				}*/
-				
 				//Создаём массив вариантов букв
 				char[] allLetters = new char[15];
 				System.arraycopy(answerLetters, 0, allLetters, 0, answerLetters.length);
@@ -170,7 +164,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 					lettersBtns.get(i).setText(String.valueOf(allLetters[i]));
 				}
 				
-				//Возвращаем нажатые кнопки
+				//Отображаем все кнопки
 				for(Button btn : lettersBtns){
 					btn.setVisibility(View.VISIBLE);
 				}
@@ -216,12 +210,26 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
+			Log.d("mLog", "pressed id: " + v.getId());
 			Button btn = (Button) v;
+			Log.d("mLog", "pressed button id: " + btn.getId());
 			btn.setVisibility(View.INVISIBLE);
-			//answerBtns.get(focusBtnNum).setText(btn.getText());
 			answerBtns.setLetter(focusBtnNum, btn);
 			if(focusBtnNum < answerLetters.length-1) focusBtnNum++;
+		}
+		
+	}
+	
+	class AnswerLettersOnClickListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			Button btn = (Button) v;
+			int position = answerBtns.indexOf(btn);
+			Log.d("mLog", "position="+position);
+			if(position > -1){
+				answerBtns.getPressedBtn(position).setVisibility(View.VISIBLE);
+			}
 		}
 		
 	}
@@ -267,7 +275,6 @@ class AnswerButtonsArray{
 	}
 	
 	void setLetter(int position, Button letter){
-		//letters.set(position, letter);
 		letters[position] = letter;
 		buttons.get(position).setText(letter.getText());
 	}
@@ -288,5 +295,27 @@ class AnswerButtonsArray{
 		for(Button button : buttons){
 			button.setText(null);
 		}
+	}
+	
+	int getLetterPosition(Button button){
+		Log.d("mLog", "button id: " + button.getId());
+		Log.d("mLog", "----------------");
+		for(int i=0; i<letters.length; i++){
+			if(letters[i] != null) Log.d("mLog", i+": "+letters[i].getId());
+		}
+		Log.d("mLog", "----------------");
+		return Arrays.asList(letters).indexOf(button);
+	}
+	
+	Button getPressedBtn(int position){
+		return letters[position];
+	}
+	
+	int indexOf(Button button){
+		return buttons.indexOf(button);
+	}
+	
+	void setOnClickListener(OnClickListener listener){
+		for(Button button : buttons) button.setOnClickListener(listener);
 	}
 }
