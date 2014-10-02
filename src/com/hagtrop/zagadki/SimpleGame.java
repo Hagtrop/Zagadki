@@ -215,7 +215,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			Log.d("mLog", "pressed button id: " + btn.getId());
 			btn.setVisibility(View.INVISIBLE);
 			answerBtns.setLetter(focusBtnNum, btn);
-			if(focusBtnNum < answerLetters.length-1) focusBtnNum++;
+			//Если следующая позиция пуста, смещаем фокус на неё
+			//if(focusBtnNum < answerLetters.length-1 && answerBtns.isEmpty(focusBtnNum + 1)) focusBtnNum++;
+			int emtyBtnNum = answerBtns.getFirstEmptyBtn();
+			if(emtyBtnNum > -1) focusBtnNum = emtyBtnNum;
 		}
 		
 	}
@@ -225,11 +228,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		@Override
 		public void onClick(View v) {
 			Button btn = (Button) v;
-			int position = answerBtns.indexOf(btn);
-			Log.d("mLog", "position="+position);
-			if(position > -1){
-				answerBtns.getPressedBtn(position).setVisibility(View.VISIBLE);
-			}
+			answerBtns.deleteLetter(btn);
+			focusBtnNum = answerBtns.indexOf(btn);
 		}
 		
 	}
@@ -275,8 +275,26 @@ class AnswerButtonsArray{
 	}
 	
 	void setLetter(int position, Button letter){
+		if(letters[position] != null){
+			deleteLetter(position);
+		}
 		letters[position] = letter;
 		buttons.get(position).setText(letter.getText());
+	}
+	
+	private void deleteLetter(int position){
+		//По позиции получаем из letters ссылку на скрытую кнопку, возвращаем кнопку
+		if(!isEmpty(position)){
+			getPressedBtn(position).setVisibility(View.VISIBLE);
+			buttons.get(position).setText(null);
+			letters[position] = null;
+		}
+	}
+	
+	void deleteLetter(Button btn){
+		//Получаем позицию нажатой кнопки в строке ответа
+		int position = indexOf(btn);
+		deleteLetter(position);
 	}
 	
 	int size(){
@@ -286,8 +304,8 @@ class AnswerButtonsArray{
 	void setVisible(int count){
 		for(int i=0; i<count; i++){
 			buttons.get(i).setVisibility(View.VISIBLE);
-			letters = new Button[count];
 		}
+		letters = new Button[count];
 		for(int i=count; i<buttons.size(); i++) buttons.get(i).setVisibility(View.GONE);
 	}
 	
@@ -297,6 +315,7 @@ class AnswerButtonsArray{
 		}
 	}
 	
+	//Возвращаем позицию, на которую встала нажатая буква
 	int getLetterPosition(Button button){
 		Log.d("mLog", "button id: " + button.getId());
 		Log.d("mLog", "----------------");
@@ -317,5 +336,21 @@ class AnswerButtonsArray{
 	
 	void setOnClickListener(OnClickListener listener){
 		for(Button button : buttons) button.setOnClickListener(listener);
+	}
+	
+	boolean isEmpty(int position){
+		if(letters[position] == null) return true;
+		else return false;
+	}
+	
+	int getFirstEmptyBtn(){
+		int position = -1;
+		for(int i=0; i<letters.length; i++){
+			if(letters[i] == null){
+				position = i;
+				break;
+			}
+		}
+		return position;
 	}
 }
