@@ -178,6 +178,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		}
 	}
 	
+	//Асинхронно загружаем вопрос, используя LoaderManager
 	private void loadQuestion(int queId){
 		Bundle bundle = new Bundle();
 		bundle.putInt("queId", queId);
@@ -197,6 +198,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	}
 
 	@Override
+	//Загружаем следующий вопрос по клику на кнопке
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		if(currentQueIndex < quesParams.size()-1){
@@ -206,6 +208,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		}
 	}
 	
+	//Обработчик для массива букв
 	class LettersOnClickListener implements OnClickListener{
 
 		@Override
@@ -213,21 +216,23 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			Log.d("mLog", "pressed id: " + v.getId());
 			Button btn = (Button) v;
 			Log.d("mLog", "pressed button id: " + btn.getId());
+			//Скрываем нажатую кнопку и пишем её букву на кнопке в строке ответа
 			btn.setVisibility(View.INVISIBLE);
 			answerBtns.setLetter(focusBtnNum, btn);
-			//Если следующая позиция пуста, смещаем фокус на неё
-			//if(focusBtnNum < answerLetters.length-1 && answerBtns.isEmpty(focusBtnNum + 1)) focusBtnNum++;
+			//Ищем первую пустую позицию в строке ответа и перемещаем фокус на неё
 			int emtyBtnNum = answerBtns.getFirstEmptyBtn();
 			if(emtyBtnNum > -1) focusBtnNum = emtyBtnNum;
 		}
 		
 	}
 	
+	//Обработчик для кнопок строки ответа
 	class AnswerLettersOnClickListener implements OnClickListener{
 
 		@Override
 		public void onClick(View v) {
 			Button btn = (Button) v;
+			//Удаляем букву с кнопки в строке ответа и устанавливаем фокус в эту позицию
 			answerBtns.deleteLetter(btn);
 			focusBtnNum = answerBtns.indexOf(btn);
 		}
@@ -235,6 +240,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	}
 }
 
+//Хранит id вопроса, уровень вопроса и id ответа
 class QueParams{
 	public final int queId;
 	public final int queLevel;
@@ -247,6 +253,7 @@ class QueParams{
 	}
 }
 
+//Перемешивает массив букв
 class ArrayShuffle{
 	static void reshuffle(char[] array){
 		Random random = new Random();
@@ -262,9 +269,10 @@ class ArrayShuffle{
 	}
 }
 
+//Класс для хранения кнопок строки ответа и соверщения операций над ними
 class AnswerButtonsArray{
-	private ArrayList<Button> buttons;
-	private Button[] letters;
+	private ArrayList<Button> buttons; //кнопки строки ответа, включая скрытые
+	private Button[] letters; //ссылки на нажатые буквы
 	
 	public AnswerButtonsArray(){
 		buttons = new ArrayList<Button>();
@@ -275,15 +283,14 @@ class AnswerButtonsArray{
 	}
 	
 	void setLetter(int position, Button letter){
-		if(letters[position] != null){
-			deleteLetter(position);
-		}
+		//Если позиция в строке ответа не пуста, то сначала очищаем её, а потом заносим новую букву
+		if(letters[position] != null) deleteLetter(position);
 		letters[position] = letter;
 		buttons.get(position).setText(letter.getText());
 	}
 	
 	private void deleteLetter(int position){
-		//По позиции получаем из letters ссылку на скрытую кнопку, возвращаем кнопку
+		//По позиции получаем из letters ссылку на скрытую кнопку, делаем её видимой
 		if(!isEmpty(position)){
 			getPressedBtn(position).setVisibility(View.VISIBLE);
 			buttons.get(position).setText(null);
@@ -301,21 +308,21 @@ class AnswerButtonsArray{
 		return buttons.size();
 	}
 	
+	//Отображаем количество кнопок в строке ответа соответствующее количеству букв в слове
 	void setVisible(int count){
-		for(int i=0; i<count; i++){
-			buttons.get(i).setVisibility(View.VISIBLE);
-		}
+		for(int i=0; i<count; i++) buttons.get(i).setVisibility(View.VISIBLE);
 		letters = new Button[count];
 		for(int i=count; i<buttons.size(); i++) buttons.get(i).setVisibility(View.GONE);
 	}
 	
+	//Удаляем буквы с кнопок строки ответа
 	void clearText(){
 		for(Button button : buttons){
 			button.setText(null);
 		}
 	}
 	
-	//Возвращаем позицию, на которую встала нажатая буква
+	//Возвращаем позицию в строке ответа, на которую встала нажатая буква
 	int getLetterPosition(Button button){
 		Log.d("mLog", "button id: " + button.getId());
 		Log.d("mLog", "----------------");
@@ -326,18 +333,23 @@ class AnswerButtonsArray{
 		return Arrays.asList(letters).indexOf(button);
 	}
 	
+	//Возвращаем ссылку на кнопку из набора букв, соответствующую нажатой букве в строке ответа
 	Button getPressedBtn(int position){
-		return letters[position];
+		if(letters[position] != null) return letters[position];
+		else return null;
 	}
 	
+	//Возвращаем порядковый номер кнопки в строке ответа
 	int indexOf(Button button){
 		return buttons.indexOf(button);
 	}
 	
+	//Назначаем общий обработчик всем кнопкам строки ответа
 	void setOnClickListener(OnClickListener listener){
 		for(Button button : buttons) button.setOnClickListener(listener);
 	}
 	
+	//Проверяем позицию в строке ответа по наличию ссылки в массиве letters
 	boolean isEmpty(int position){
 		if(letters[position] == null) return true;
 		else return false;
