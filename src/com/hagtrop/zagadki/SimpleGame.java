@@ -34,7 +34,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	private static final int ARRAY_LOADER = 0;
 	private static final int QUESTION_LOADER = 1;
-	private ArrayList<QueParams> quesParams;
+	private ArrayList<QueStatus> queStatusList;
 	private SQLiteDatabase database;
 	private int currentQueIndex = 0;
 	private ArrayList<Button> lettersBtns;
@@ -47,6 +47,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private Toast toastTrue;
 	private Toast toastFalse;
 	private boolean playerAnswerTrue;
+	private BaseHelper baseHelper;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,13 +105,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		
 		
 				
-		BaseHelper baseHelper = BaseHelper.getInstance(this);
+		baseHelper = BaseHelper.getInstance(this);
 		
 		//Если игра сохранена - загружаем, если нет - создаём новую
-		if(baseHelper.simpleGameExists()){
-			//
-		}
-		else{
+		if(!baseHelper.simpleGameExists()){
 			baseHelper.newSimpleGame();
 			Log.d("mLog", "STEP: getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this)");	
 		}
@@ -138,18 +136,19 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		//Сохраняем в ArrayList параметры и характеристики вопросов для дальнейшей сортировки
 		case ARRAY_LOADER:
 			if(cursor.moveToFirst()){
-				quesParams = new ArrayList<QueParams>();
-				int queId, queLevel, answerId;
+				queStatusList = new ArrayList<QueStatus>();
+				int queId, queStatus;
 				do{
-					queId = cursor.getInt(cursor.getColumnIndex("_id"));
-			        queLevel = cursor.getInt(cursor.getColumnIndex("level"));
-			        answerId = cursor.getInt(cursor.getColumnIndex("answer_id"));
-			        quesParams.add(new QueParams(queId, queLevel, answerId));
+					queId = cursor.getInt(cursor.getColumnIndex("question_id"));
+					queStatus = cursor.getInt(cursor.getColumnIndex("status"));
+					queStatusList.add(new QueStatus(queId, queStatus));
 				} while(cursor.moveToNext());
 			}
-			Collections.sort(quesParams);
-			printArray(quesParams);
-			loadQuestion(quesParams.get(0).queId);
+			while(currentQueIndex < queStatusList.size() && queStatusList.get(currentQueIndex).getStatus() != 0){
+				currentQueIndex++;
+			}
+			printArray(queStatusList);
+			loadQuestion(queStatusList.get(currentQueIndex).getId());
 			break;
 		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
@@ -203,13 +202,13 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub 
 		
 	}
 	
-	private void printArray(ArrayList<QueParams> mArray){
-		for(QueParams mParams : mArray){
-			Log.d("mLog", "queId=" + mParams.queId + " queLevel=" + mParams.queLevel + " answerId=" + mParams.answerId);
+	private void printArray(ArrayList<QueStatus> mArray){
+		for(QueStatus qStatus : mArray){
+			Log.d("mLog", "queId=" + qStatus.getId() + " queStatus=" + qStatus.getStatus());
 		}
 	}
 
@@ -232,9 +231,9 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			dialog.show(fManager, "answer_result_dialog");
 			break;
 		case R.id.a1_nextBtn:
-			if(currentQueIndex < quesParams.size()-1){
+			if(currentQueIndex < queStatusList.size()-1){
 				currentQueIndex++;
-				loadQuestion(quesParams.get(currentQueIndex).queId);
+				loadQuestion(queStatusList.get(currentQueIndex).getId());
 				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
 			}
 			break;
@@ -281,43 +280,25 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	public void onDialogDismiss(DialogFragment dialog) {
 		Log.d("mLog", "Dialog dismissed");
 		if(playerAnswerTrue){
+			baseHelper.updateQueStatus(queStatusList.get(currentQueIndex).getId());
 			//Загружаем следующий вопрос
-			if(currentQueIndex < quesParams.size()-1){
+			if(currentQueIndex < queStatusList.size()-1){
 				currentQueIndex++;
-				loadQuestion(quesParams.get(currentQueIndex).queId);
+				loadQuestion(queStatusList.get(currentQueIndex).getId());
 				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+			}
+			else{
+				baseHelper.deleteSimpleGame();
+				Toast.makeText(this, "Игра закончена!", Toast.LENGTH_LONG).show();
+				database.close();
+				baseHelper.close();
+				finish();
 			}
 		}
 		else{
 			
 		}
 		
-	}
-}
-
-//Хранит id вопроса, уровень вопроса и id ответа
-class QueParams implements Comparable<QueParams>{
-	public final int queId;
-	public final int queLevel;
-	public final int answerId;
-	
-	public QueParams(int queId, int queLevel, int answerId){
-		this.queId = queId;
-		this.queLevel = queLevel;
-		this.answerId = answerId;
-	}
-
-	@Override
-	public int compareTo(QueParams another) {
-		// TODO Auto-generated method stub
-		int result = 0;
-		if(this.queLevel > another.queLevel){
-			result = 1;
-		}
-		else if(this.queLevel < another.queLevel){
-			result = -1;
-		}
-		return result;
 	}
 }
 
@@ -445,4 +426,21 @@ class AnswerButtonsArray{
 	/*void setFocusedBg(int position){
 		buttons.get(position).setBackground(android.R.drawable.btn_default_small_pressed);
 	}*/
+}
+
+class QueStatus{
+	private int id, status;
+	
+	public QueStatus(int id, int status){
+		this.id = id;
+		this.status = status;
+	}
+	
+	int getId(){
+		return id;
+	}
+	
+	int getStatus(){
+		return status;
+	}
 }

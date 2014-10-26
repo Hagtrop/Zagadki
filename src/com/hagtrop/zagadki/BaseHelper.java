@@ -5,9 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -55,13 +59,45 @@ public class BaseHelper extends SQLiteOpenHelper {
 
 	}
 	
+	public void deleteSimpleGame(){
+		simpleGameExists = false;
+	}
+	
 	public void newSimpleGame(){
 		String deleteQuery, createQuery;
 		deleteQuery = "DROP TABLE IF EXISTS simple_game";
-		createQuery = "CREATE TABLE simple_game(id INTEGER, question_id INTEGER, status INTEGER DEFAULT 0)";
+		createQuery = "CREATE TABLE simple_game(question_id INTEGER, status INTEGER DEFAULT 0)";
 		SQLiteDatabase database = getWritableDatabase();
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);
+		
+		//Загружаем данные из таблицы вопросов, сортируем вопросы и наполняем отсортированным списком таблицу simple_game
+		Cursor cursor = database.query("questions", new String[]{"questions._id", "questions.level", "questions.answer_id"}, null, null, null, null, null);
+		if(cursor.moveToFirst()){
+			ArrayList<QueParams> quesParams = new ArrayList<QueParams>();
+			int queId, queLevel, answerId;
+			do{
+				queId = cursor.getInt(cursor.getColumnIndex("_id"));
+		        queLevel = cursor.getInt(cursor.getColumnIndex("level"));
+		        answerId = cursor.getInt(cursor.getColumnIndex("answer_id"));
+		        quesParams.add(new QueParams(queId, queLevel, answerId));
+			} while(cursor.moveToNext());
+			Collections.sort(quesParams);
+			ContentValues cv;
+			database.beginTransaction();
+			try{
+				for(QueParams params : quesParams){
+					cv = new ContentValues();
+					cv.put("question_id", params.queId);
+					database.insert("simple_game", null, cv);
+				}
+				database.setTransactionSuccessful();
+			}
+			finally{
+				database.endTransaction();
+			}
+			
+		}
 		database.close();
 		simpleGameExists = true;
 	}
@@ -100,6 +136,13 @@ public class BaseHelper extends SQLiteOpenHelper {
 	    			output.close();
 	    		} catch (IOException e){Log.d("mLog", e.toString());}
 	    }
+	}
+	
+	void updateQueStatus(int queId){
+		SQLiteDatabase database = getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("status", 1);
+		database.update("simple_game", cv, "question_id=?", new String[]{String.valueOf(queId)});
 	}
 
 }
