@@ -23,61 +23,71 @@
             android:id="@+id/a1_answerBtn1"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn2"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn3"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn4"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn5"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn6"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn7"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn8"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn9"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/a1_answerBtn10"
             style="@style/AnswerLetterBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false" />
 
     </LinearLayout>
 
@@ -205,6 +215,14 @@
 
         </TableRow>
     </TableLayout>
+
+    <Button
+        android:id="@+id/a1_checkBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="@string/a1_checkBtn" />
 
     <Button
         android:id="@+id/a1_nextBtn"

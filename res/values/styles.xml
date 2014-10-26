@@ -24,6 +24,10 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
+    <style name="dialog_animation_fade" >
+        <item name="android:windowEnterAnimation">@animator/fade_in_dialog</item>
+        <item name="android:windowExitAnimation">@animator/fade_out_dialog</item>
+	</style>
     
 
 </resources>

@@ -41,7 +41,7 @@
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/a0_countdownBtn"
+            android:id="@+id/true_dialog"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

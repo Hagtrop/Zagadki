@@ -2,6 +2,7 @@ package com.hagtrop.zagadki;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Random;
 
@@ -10,20 +11,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.R.drawable;
 
-public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener {
+public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, TrueFalseDialog.NoticeDialogListener {
 	TextView questionTV, answerTV;
-	Button nextBtn;
+	Button nextBtn, checkBtn;
 	LinearLayout answerLayout;
 	
 	private static final int ARRAY_LOADER = 0;
@@ -38,6 +44,9 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
 	private int focusBtnNum = 0;
+	private Toast toastTrue;
+	private Toast toastFalse;
+	private boolean playerAnswerTrue;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +54,15 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
 		
+		toastTrue = Toast.makeText(this, R.string.a1_toast_true, Toast.LENGTH_SHORT);
+		toastFalse = Toast.makeText(this, R.string.a1_toast_false, Toast.LENGTH_SHORT);
+		
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
 		nextBtn.setOnClickListener(this);
+		checkBtn = (Button) findViewById(R.id.a1_checkBtn);
+		checkBtn.setOnClickListener(this);
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
 		
 		//Объединяем в массив пустые кнопки ответа
@@ -133,6 +147,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			        quesParams.add(new QueParams(queId, queLevel, answerId));
 				} while(cursor.moveToNext());
 			}
+			Collections.sort(quesParams);
 			printArray(quesParams);
 			loadQuestion(quesParams.get(0).queId);
 			break;
@@ -173,6 +188,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				
 				//Устанавливаем фокус в позицию 0
 				focusBtnNum = 0;
+				
 			}
 		default: break;
 		}
@@ -201,10 +217,28 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	//Загружаем следующий вопрос по клику на кнопке
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		if(currentQueIndex < quesParams.size()-1){
-			currentQueIndex++;
-			loadQuestion(quesParams.get(currentQueIndex).queId);
-			Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+		switch(v.getId()){
+		case R.id.a1_checkBtn:
+			Log.d("mLog", "Answer: " + answerBtns.getPlayerAnswer());
+			if(answerBtns.getPlayerAnswer().equals(answer)){
+				playerAnswerTrue = true;
+				//Вывод следующего вопроса в методе onDialogDismiss
+			}
+			else{
+				playerAnswerTrue = false;
+			}
+			FragmentManager fManager = getSupportFragmentManager();
+			TrueFalseDialog dialog = new TrueFalseDialog(playerAnswerTrue);
+			dialog.show(fManager, "answer_result_dialog");
+			break;
+		case R.id.a1_nextBtn:
+			if(currentQueIndex < quesParams.size()-1){
+				currentQueIndex++;
+				loadQuestion(quesParams.get(currentQueIndex).queId);
+				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+			}
+			break;
+		default: break;
 		}
 	}
 	
@@ -221,7 +255,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			answerBtns.setLetter(focusBtnNum, btn);
 			//Ищем первую пустую позицию в строке ответа и перемещаем фокус на неё
 			int emtyBtnNum = answerBtns.getFirstEmptyBtn();
-			if(emtyBtnNum > -1) focusBtnNum = emtyBtnNum;
+			if(emtyBtnNum > -1){
+				focusBtnNum = emtyBtnNum;
+			}
+			else checkBtn.setEnabled(true);
 		}
 		
 	}
@@ -235,13 +272,31 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			//Удаляем букву с кнопки в строке ответа и устанавливаем фокус в эту позицию
 			answerBtns.deleteLetter(btn);
 			focusBtnNum = answerBtns.indexOf(btn);
+			if(answerBtns.getFirstEmptyBtn() > -1) checkBtn.setEnabled(false);
+		}
+		
+	}
+
+	@Override
+	public void onDialogDismiss(DialogFragment dialog) {
+		Log.d("mLog", "Dialog dismissed");
+		if(playerAnswerTrue){
+			//Загружаем следующий вопрос
+			if(currentQueIndex < quesParams.size()-1){
+				currentQueIndex++;
+				loadQuestion(quesParams.get(currentQueIndex).queId);
+				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+			}
+		}
+		else{
+			
 		}
 		
 	}
 }
 
 //Хранит id вопроса, уровень вопроса и id ответа
-class QueParams{
+class QueParams implements Comparable<QueParams>{
 	public final int queId;
 	public final int queLevel;
 	public final int answerId;
@@ -250,6 +305,19 @@ class QueParams{
 		this.queId = queId;
 		this.queLevel = queLevel;
 		this.answerId = answerId;
+	}
+
+	@Override
+	public int compareTo(QueParams another) {
+		// TODO Auto-generated method stub
+		int result = 0;
+		if(this.queLevel > another.queLevel){
+			result = 1;
+		}
+		else if(this.queLevel < another.queLevel){
+			result = -1;
+		}
+		return result;
 	}
 }
 
@@ -365,4 +433,16 @@ class AnswerButtonsArray{
 		}
 		return position;
 	}
+	
+	String getPlayerAnswer(){
+		String result = "";
+		for(Button btn : buttons){
+			if(btn.getVisibility() == View.VISIBLE) result += btn.getText();
+		}
+		return result;
+	}
+	
+	/*void setFocusedBg(int position){
+		buttons.get(position).setBackground(android.R.drawable.btn_default_small_pressed);
+	}*/
 }

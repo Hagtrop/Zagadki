@@ -8,6 +8,9 @@
     <string name="a0_sandsBtn">Пески времени</string>
     <string name="a1_questionTV">Текст загадки</string>
     <string name="a1_answerTV">Текст ответа</string>
+    <string name="a1_checkBtn">Проверить</string>
     <string name="a1_nextBtn">Дальше</string>
+    <string name="a1_toast_true">Верно!</string>
+    <string name="a1_toast_false">Неверно!</string>
 
 </resources>

@@ -24,7 +24,7 @@ public class MainActivity extends Activity implements OnClickListener{
         variantsBtn = (Button) findViewById(R.id.a0_variantsBtn);
         variantsBtn.setOnClickListener(this);
         
-        countdownBtn = (Button) findViewById(R.id.a0_countdownBtn);
+        countdownBtn = (Button) findViewById(R.id.true_dialog);
         countdownBtn.setOnClickListener(this);
         
         sandsBtn = (Button) findViewById(R.id.a0_sandsBtn);
@@ -48,7 +48,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			break;
 		case R.id.a0_variantsBtn:
 			break;
-		case R.id.a0_countdownBtn:
+		case R.id.true_dialog:
 			break;
 		case R.id.a0_sandsBtn:
 			break;
