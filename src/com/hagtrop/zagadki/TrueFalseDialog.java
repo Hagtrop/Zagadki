@@ -1,7 +1,6 @@
 package com.hagtrop.zagadki;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager.LayoutParams;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +17,9 @@ import android.view.Window;
 
 public class TrueFalseDialog extends DialogFragment {
 	
-	private int layoutId;
+	public static final String DIALOG_TYPE = "True-False Message";
 	
-	public interface NoticeDialogListener{
-		public void onDialogDismiss(DialogFragment dialog);
-	}
+	private int layoutId;
 	
 	NoticeDialogListener mListener;
 	
@@ -44,9 +40,7 @@ public class TrueFalseDialog extends DialogFragment {
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(layoutId, container, false);
 	}
 	
@@ -83,7 +77,7 @@ public class TrueFalseDialog extends DialogFragment {
 	@Override
 	public void onDismiss(DialogInterface dialog) {
 		super.onDismiss(dialog);
-		mListener.onDialogDismiss(TrueFalseDialog.this);
+		mListener.onDialogDismiss(TrueFalseDialog.this, DIALOG_TYPE);
 	}
 
 

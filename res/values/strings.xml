@@ -10,7 +10,9 @@
     <string name="a1_answerTV">Текст ответа</string>
     <string name="a1_checkBtn">Проверить</string>
     <string name="a1_nextBtn">Дальше</string>
-    <string name="a1_toast_true">Верно!</string>
-    <string name="a1_toast_false">Неверно!</string>
+    <string name="message_true">Поздравляем!\nВы ответили верно.</string>
+    <string name="message_false">Неверно!</string>
+    <string name="message_gemeover">Поздравляем!\nВы отгадали все загадки.</string>
+    <string name="gameover_dialog_okBtn">Я молодец!</string>
 
 </resources>

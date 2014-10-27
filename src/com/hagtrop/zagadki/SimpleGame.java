@@ -2,32 +2,26 @@ package com.hagtrop.zagadki;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Random;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.R.drawable;
 
-public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, TrueFalseDialog.NoticeDialogListener {
+public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
 	TextView questionTV, answerTV;
 	Button nextBtn, checkBtn;
 	LinearLayout answerLayout;
@@ -44,8 +38,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
 	private int focusBtnNum = 0;
-	private Toast toastTrue;
-	private Toast toastFalse;
 	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
 	
@@ -54,9 +46,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
-		
-		toastTrue = Toast.makeText(this, R.string.a1_toast_true, Toast.LENGTH_SHORT);
-		toastFalse = Toast.makeText(this, R.string.a1_toast_false, Toast.LENGTH_SHORT);
 		
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
@@ -277,28 +266,33 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	}
 
 	@Override
-	public void onDialogDismiss(DialogFragment dialog) {
+	public void onDialogDismiss(DialogFragment dialog, String dialogType) {
 		Log.d("mLog", "Dialog dismissed");
-		if(playerAnswerTrue){
-			baseHelper.updateQueStatus(queStatusList.get(currentQueIndex).getId());
-			//Загружаем следующий вопрос
-			if(currentQueIndex < queStatusList.size()-1){
-				currentQueIndex++;
-				loadQuestion(queStatusList.get(currentQueIndex).getId());
-				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
-			}
-			else{
-				baseHelper.deleteSimpleGame();
-				Toast.makeText(this, "Игра закончена!", Toast.LENGTH_LONG).show();
-				database.close();
-				baseHelper.close();
-				finish();
+		if(dialogType.equals(TrueFalseDialog.DIALOG_TYPE)){
+			if(playerAnswerTrue){
+				baseHelper.updateQueStatus(queStatusList.get(currentQueIndex).getId());
+				//Загружаем следующий вопрос
+				if(currentQueIndex < queStatusList.size()-1){
+					currentQueIndex++;
+					loadQuestion(queStatusList.get(currentQueIndex).getId());
+					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+				}
+				else{
+					//Если вопросы кончились, удаляем таблицу текущей игры
+					baseHelper.deleteSimpleGame();
+					//Выводим сообщение о том, что игра закончена
+					FragmentManager fManager = getSupportFragmentManager();
+					GameoverDialog gameoverDialog = new GameoverDialog();
+					gameoverDialog.show(fManager, "gameover_dialog");
+					//Закрываем соединение с БД
+					baseHelper.close();
+				}
 			}
 		}
-		else{
-			
+		else if(dialogType.equals(GameoverDialog.DIALOG_TYPE)){
+			//Возвращаемся в меню выбора типа игры
+			finish();
 		}
-		
 	}
 }
 
