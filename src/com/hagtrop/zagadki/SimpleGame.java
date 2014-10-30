@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
-	TextView questionTV, answerTV;
+	TextView questionTV, answerTV, progressTV, levelTV;
 	Button nextBtn, checkBtn;
 	LinearLayout answerLayout;
 	
@@ -33,13 +33,15 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private int currentQueIndex = 0;
 	private ArrayList<Button> lettersBtns;
 	private AnswerButtonsArray answerBtns;
-	private String question, answer;
+	//private String question, answer;
+	//private int queLevel;
 	private char[] answerLetters;
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
 	private int focusBtnNum = 0;
 	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
+	private Question currentQuestion;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
 		
+		progressTV = (TextView) findViewById(R.id.a1_progressTV);
+		levelTV = (TextView) findViewById(R.id.a1_levelTV);
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
@@ -142,15 +146,27 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
 			if(cursor.moveToFirst()){
+				/*String question, answer;
+				int level;
 				question = cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n");
 				answer = cursor.getString(cursor.getColumnIndex("answer"));
 				answer = answer.trim().toUpperCase(new Locale("ru"));
-				Log.d("mLog", question);
-				Log.d("mLog", answer);
-				questionTV.setText(question);
-				answerTV.setText(answer);
+				level = cursor.getInt(cursor.getColumnIndex("level"));
+				currentQuestion = new Question(question, answer, level);*/
+				
+				currentQuestion = new Question(
+						cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n"),
+						cursor.getString(cursor.getColumnIndex("answer")).trim().toUpperCase(new Locale("ru")),
+						cursor.getInt(cursor.getColumnIndex("level")));
+				
+				Log.d("mLog", currentQuestion.getQuestion());
+				Log.d("mLog", currentQuestion.getAnswer());
+				progressTV.setText(getString(R.string.a1_progressTV) + " " + (currentQueIndex+1) + "/" + queStatusList.size());
+				levelTV.setText(getString(R.string.a1_levelTV) + " " + currentQuestion.getLevel());
+				questionTV.setText(currentQuestion.getQuestion());
+				answerTV.setText(currentQuestion.getAnswer());
 				Log.d("mLog", "QUESTION_LOADER");
-				answerLetters = answer.toCharArray();
+				answerLetters = currentQuestion.getAnswer().toCharArray();
 				answerBtns.setVisible(answerLetters.length);
 				
 				//Создаём массив вариантов букв
@@ -208,7 +224,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		switch(v.getId()){
 		case R.id.a1_checkBtn:
 			Log.d("mLog", "Answer: " + answerBtns.getPlayerAnswer());
-			if(answerBtns.getPlayerAnswer().equals(answer)){
+			if(answerBtns.getPlayerAnswer().equals(currentQuestion.getAnswer())){
 				playerAnswerTrue = true;
 				//Вывод следующего вопроса в методе onDialogDismiss
 			}
@@ -420,6 +436,25 @@ class AnswerButtonsArray{
 	/*void setFocusedBg(int position){
 		buttons.get(position).setBackground(android.R.drawable.btn_default_small_pressed);
 	}*/
+}
+
+class Question{
+	private final String question, answer;
+	private final int level;
+	public Question(String question, String answer, int level){
+		this.question = question;
+		this.answer = answer;
+		this.level = level;
+	}
+	public String getQuestion(){
+		return question;
+	}
+	public String getAnswer(){
+		return answer;
+	}
+	public int getLevel(){
+		return level;
+	}
 }
 
 class QueStatus{

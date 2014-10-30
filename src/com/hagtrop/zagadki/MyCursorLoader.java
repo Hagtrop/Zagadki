@@ -27,7 +27,7 @@ public class MyCursorLoader extends CursorLoader{
 	private static final String SIMPLE_GAME_ID_COLUMN = "simple_game.question_id";
 	private static final String SIMPLE_GAME_STATUS_COLUMN = "simple_game.status";
 	
-	private static final String QA_SQL = "SELECT questions.question, answers.answer FROM questions INNER JOIN answers ON questions.answer_id=answers._id WHERE questions._id=?";
+	private static final String QA_SQL = "SELECT questions.question, questions.level, answers.answer FROM questions INNER JOIN answers ON questions.answer_id=answers._id WHERE questions._id=?";
 	
 	private SQLiteDatabase database;
 	private int questionId;

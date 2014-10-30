@@ -5,6 +5,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/a1_progressTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/a1_progressTV" />
+
+        <TextView
+            android:id="@+id/a1_levelTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/a1_levelTV" />
+
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/a1_questionTV"
         android:layout_width="wrap_content"
@@ -88,7 +111,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="false" />
-
     </LinearLayout>
 
     <TextView
@@ -136,7 +158,6 @@
                 style="@style/AnswerLetterBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
         </TableRow>
 
         <TableRow
@@ -174,7 +195,6 @@
                 style="@style/AnswerLetterBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
         </TableRow>
 
         <TableRow
@@ -212,7 +232,6 @@
                 style="@style/AnswerLetterBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
         </TableRow>
     </TableLayout>
 
