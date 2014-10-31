@@ -19,7 +19,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
 	TextView questionTV, answerTV, progressTV, levelTV;
@@ -33,8 +32,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private int currentQueIndex = 0;
 	private ArrayList<Button> lettersBtns;
 	private AnswerButtonsArray answerBtns;
-	//private String question, answer;
-	//private int queLevel;
 	private char[] answerLetters;
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
@@ -45,7 +42,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
 		
@@ -92,11 +88,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		lettersBtns.add((Button) findViewById(R.id.a1_letterBtn15));
 		LettersOnClickListener lettersOnClickListener = new LettersOnClickListener();
 		for(Button btn : lettersBtns) btn.setOnClickListener(lettersOnClickListener);
-		
-		//Создаём кнопку со своим стилем
-		//Button btnA = new Button(this, null, R.style.AnswerLetterBtn);
-		
-		
 				
 		baseHelper = BaseHelper.getInstance(this);
 		
@@ -111,7 +102,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
-		// TODO Auto-generated method stub
 		Log.d("mLog", "onCreateLoader");
 		switch(loaderID){
 		case ARRAY_LOADER:
@@ -146,14 +136,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
 			if(cursor.moveToFirst()){
-				/*String question, answer;
-				int level;
-				question = cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n");
-				answer = cursor.getString(cursor.getColumnIndex("answer"));
-				answer = answer.trim().toUpperCase(new Locale("ru"));
-				level = cursor.getInt(cursor.getColumnIndex("level"));
-				currentQuestion = new Question(question, answer, level);*/
-				
 				currentQuestion = new Question(
 						cursor.getString(cursor.getColumnIndex("question")).replace("\\n", "\n"),
 						cursor.getString(cursor.getColumnIndex("answer")).trim().toUpperCase(new Locale("ru")),
@@ -248,7 +230,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	//Обработчик для массива букв
 	class LettersOnClickListener implements OnClickListener{
-
 		@Override
 		public void onClick(View v) {
 			Log.d("mLog", "pressed id: " + v.getId());
@@ -269,7 +250,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	//Обработчик для кнопок строки ответа
 	class AnswerLettersOnClickListener implements OnClickListener{
-
 		@Override
 		public void onClick(View v) {
 			Button btn = (Button) v;

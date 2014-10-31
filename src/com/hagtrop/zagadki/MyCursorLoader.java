@@ -3,7 +3,6 @@ package com.hagtrop.zagadki;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 
 public class MyCursorLoader extends CursorLoader{
@@ -31,17 +30,6 @@ public class MyCursorLoader extends CursorLoader{
 	
 	private SQLiteDatabase database;
 	private int questionId;
-
-	/*public MyCursorLoader(Context context, SQLiteDatabase database, String tableName, String[] columns, String selection, String[] selectionArgs, String sortOrder) {
-		super(context);
-		// TODO Auto-generated constructor stub
-		this.database = database;
-		this.tableName = tableName;
-		this.columns = columns;
-		this.selection = selection;
-		this.selectionArgs = selectionArgs;
-		this.sortOrder = sortOrder;
-	}*/
 	
 	public MyCursorLoader(Context context, SQLiteDatabase database){
 		super(context);
