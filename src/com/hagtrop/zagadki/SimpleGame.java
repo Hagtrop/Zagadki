@@ -103,12 +103,15 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
 		Log.d("mLog", "onCreateLoader");
+		Bundle params;
 		switch(loaderID){
 		case ARRAY_LOADER:
-			return new MyCursorLoader(this, database);
+			return new MyCursorLoader(this, database, MyCursorLoader.SIMPLE_GAME_QUES, null);
 		case QUESTION_LOADER:
 			Log.d("mLog", "onCreateLoader, queId=" + bundle.getInt("queId"));
-			return new MyCursorLoader(this, database, bundle.getInt("queId"));
+			params = new Bundle();
+			params.putInt("questionId", bundle.getInt("queId"));
+			return new MyCursorLoader(this, database, MyCursorLoader.QUE_AND_ANSWER, params);
 		default: return null;
 		}
 	}
@@ -175,6 +178,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				//Устанавливаем фокус в позицию 0
 				focusBtnNum = 0;
 				
+				break;
 			}
 		default: break;
 		}
@@ -289,22 +293,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			//Возвращаемся в меню выбора типа игры
 			finish();
 		}
-	}
-}
-
-//Перемешивает массив букв
-class ArrayShuffle{
-	static void reshuffle(char[] array){
-		Random random = new Random();
-		for(int i=array.length-1; i>0; i--){
-			int j = random.nextInt(i+1);
-			swap(array, i, j);
-		}
-	}
-	private static void swap(char[] array, int i, int j){
-		char temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
 	}
 }
 

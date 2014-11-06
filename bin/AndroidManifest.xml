@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name="SimpleGame"></activity>
+        <activity android:name="TestGame"></activity>
     </application>
 
 </manifest>

@@ -47,6 +47,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			startActivity(new Intent(this, SimpleGame.class));
 			break;
 		case R.id.a0_variantsBtn:
+			startActivity(new Intent(this, TestGame.class));
 			break;
 		case R.id.true_dialog:
 			break;
