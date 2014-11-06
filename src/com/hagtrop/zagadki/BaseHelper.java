@@ -106,7 +106,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 	public void newTestGame(){
 		String deleteQuery, createQuery;
 		deleteQuery = "DROP TABLE IF EXISTS test_game";
-		createQuery = "CREATE TABLE test_game(question_id INTEGER, status INTEGER DEFAULT 0)";
+		createQuery = "CREATE TABLE test_game(question_id INTEGER, status INTEGER DEFAULT 0, attempts INTEGER DEFAULT 0)";
 		SQLiteDatabase database = getWritableDatabase();
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);
@@ -184,11 +184,19 @@ public class BaseHelper extends SQLiteOpenHelper {
 	    }
 	}
 	
-	void updateQueStatus(int queId){
+	void updateSimpleGame(int queId){
 		SQLiteDatabase database = getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put("status", 1);
 		database.update("simple_game", cv, "question_id=?", new String[]{String.valueOf(queId)});
+	}
+	
+	void updateTestGame(int queId, int attempts, int status){
+		SQLiteDatabase database = getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("attempts", attempts);
+		cv.put("status", status);
+		database.update("test_game", cv, "question_id=?", new String[]{String.valueOf(queId)});
 	}
 
 }

@@ -29,6 +29,10 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 	private int currentQueIndex = 0;
 	private Question currentQuestion;
 	private String[] variants;
+	private int buttonsPressed = 0;
+	private int maxAttemptsCount;
+	private int attemptsMade;
+	
 	
 
 	@Override
@@ -76,6 +80,13 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		public void onClick(View v) {
 			Button btn = (Button) v;
 			btn.setEnabled(false);
+			buttonsPressed++;
+			if(btn.getText().equals(currentQuestion.getAnswer())){
+				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 1);
+			}
+			else{
+				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 0);
+			}
 		}
 		
 	}
@@ -106,12 +117,18 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		case ARRAY_LOADER:
 			if(cursor.moveToFirst()){
 				queStatusList = new ArrayList<QueStatus>();
-				int queId, queStatus;
+				int queAttempts;
 				do{
-					queId = cursor.getInt(cursor.getColumnIndex("question_id"));
-					queStatus = cursor.getInt(cursor.getColumnIndex("status"));
-					queStatusList.add(new QueStatus(queId, queStatus));
+					queAttempts = cursor.getInt(cursor.getColumnIndex("attempts"));
+					attemptsMade += queAttempts;
+					queStatusList.add(new QueStatus(
+							cursor.getInt(cursor.getColumnIndex("question_id")), 
+							cursor.getInt(cursor.getColumnIndex("status")), 
+							queAttempts));
+					
 				} while(cursor.moveToNext());
+				maxAttemptsCount = queStatusList.size()*2;
+				attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + (maxAttemptsCount-attemptsMade));
 			}
 			while(currentQueIndex < queStatusList.size() && queStatusList.get(currentQueIndex).getStatus() != 0){
 				currentQueIndex++;
@@ -141,7 +158,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 				variants = new String[6];
 				int i = 0;
 				do{
-					variants[i] = cursor.getString(cursor.getColumnIndex("answer"));
+					variants[i] = cursor.getString(cursor.getColumnIndex("answer")).toUpperCase(new Locale("ru"));
 					i++;
 				}
 				while(cursor.moveToNext());

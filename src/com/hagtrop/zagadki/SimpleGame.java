@@ -270,7 +270,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		Log.d("mLog", "Dialog dismissed");
 		if(dialogType.equals(TrueFalseDialog.DIALOG_TYPE)){
 			if(playerAnswerTrue){
-				baseHelper.updateQueStatus(queStatusList.get(currentQueIndex).getId());
+				baseHelper.updateSimpleGame(queStatusList.get(currentQueIndex).getId());
 				//Загружаем следующий вопрос
 				if(currentQueIndex < queStatusList.size()-1){
 					currentQueIndex++;
@@ -427,10 +427,17 @@ class Question{
 
 class QueStatus{
 	private int id, status;
+	private int attempts;
 	
 	public QueStatus(int id, int status){
 		this.id = id;
 		this.status = status;
+	}
+	
+	public QueStatus(int id, int status, int attempts){
+		this.id = id;
+		this.status = status;
+		this.attempts = attempts;
 	}
 	
 	int getId(){
@@ -439,5 +446,9 @@ class QueStatus{
 	
 	int getStatus(){
 		return status;
+	}
+	
+	int getAttempts(){
+		return attempts;
 	}
 }
