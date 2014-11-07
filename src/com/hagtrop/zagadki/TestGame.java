@@ -83,6 +83,12 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			buttonsPressed++;
 			if(btn.getText().equals(currentQuestion.getAnswer())){
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 1);
+				
+				if(currentQueIndex < queStatusList.size()-1){
+					currentQueIndex++;
+					loadQuestion(queStatusList.get(currentQueIndex).getId());
+					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+				}
 			}
 			else{
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 0);
