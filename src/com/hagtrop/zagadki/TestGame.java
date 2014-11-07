@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TestGame extends FragmentActivity implements OnClickListener, LoaderCallbacks<Cursor>{
 	TextView progressTV, levelTV, attemptsTV, questionTV, answerTV;
@@ -30,8 +31,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 	private Question currentQuestion;
 	private String[] variants;
 	private int buttonsPressed = 0;
-	private int maxAttemptsCount;
-	private int attemptsMade;
+	private int attemptsRemaining;
 	
 	
 
@@ -81,10 +81,12 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			Button btn = (Button) v;
 			btn.setEnabled(false);
 			buttonsPressed++;
+			attemptsRemaining--;
+			attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + attemptsRemaining);
 			if(btn.getText().equals(currentQuestion.getAnswer())){
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 1);
 				
-				if(currentQueIndex < queStatusList.size()-1){
+				if(currentQueIndex < queStatusList.size()-1 && attemptsRemaining > 0){
 					currentQueIndex++;
 					loadQuestion(queStatusList.get(currentQueIndex).getId());
 					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
@@ -92,6 +94,12 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			}
 			else{
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 0);
+			}
+			if(attemptsRemaining < 1){
+				Toast.makeText(getApplicationContext(), "Попытки закончились", Toast.LENGTH_LONG).show();
+				baseHelper.deleteTestGame();
+				baseHelper.close();
+				finish();
 			}
 		}
 		
@@ -124,6 +132,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			if(cursor.moveToFirst()){
 				queStatusList = new ArrayList<QueStatus>();
 				int queAttempts;
+				int attemptsMade = 0;
 				do{
 					queAttempts = cursor.getInt(cursor.getColumnIndex("attempts"));
 					attemptsMade += queAttempts;
@@ -133,8 +142,8 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 							queAttempts));
 					
 				} while(cursor.moveToNext());
-				maxAttemptsCount = queStatusList.size()*2;
-				attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + (maxAttemptsCount-attemptsMade));
+				attemptsRemaining = queStatusList.size()*2-attemptsMade;
+				attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + attemptsRemaining);
 			}
 			while(currentQueIndex < queStatusList.size() && queStatusList.get(currentQueIndex).getStatus() != 0){
 				currentQueIndex++;

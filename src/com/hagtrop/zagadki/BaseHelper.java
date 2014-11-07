@@ -103,6 +103,10 @@ public class BaseHelper extends SQLiteOpenHelper {
 		simpleGameExists = true;
 	}
 	
+	public void deleteTestGame(){
+		testGameExists = false;
+	}
+	
 	public void newTestGame(){
 		String deleteQuery, createQuery;
 		deleteQuery = "DROP TABLE IF EXISTS test_game";
