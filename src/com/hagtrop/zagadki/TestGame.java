@@ -36,7 +36,6 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 	private int currentQueIndex = 0;
 	private Question currentQuestion;
 	private String[] variants;
-	private int buttonsPressed = 0;
 	private int attemptsRemaining;
 	
 	
@@ -116,11 +115,11 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		public void onClick(View v) {
 			Button btn = (Button) v;
 			btn.setEnabled(false);
-			buttonsPressed++;
 			attemptsRemaining--;
+			queStatusList.get(currentQueIndex).addAttempt();
 			attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + attemptsRemaining);
 			if(btn.getText().equals(currentQuestion.getAnswer())){
-				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 1);
+				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), queStatusList.get(currentQueIndex).getAttempts(), 1);
 				
 				if(currentQueIndex < queStatusList.size()-1 && attemptsRemaining > 0){
 					currentQueIndex++;
@@ -135,7 +134,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 				}
 			}
 			else{
-				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 0);
+				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), queStatusList.get(currentQueIndex).getAttempts(), 0);
 			}
 			if(attemptsRemaining < 1){
 				Toast.makeText(getApplicationContext(), "Попытки закончились", Toast.LENGTH_LONG).show();

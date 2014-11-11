@@ -451,4 +451,8 @@ class QueStatus{
 	int getAttempts(){
 		return attempts;
 	}
+	
+	void addAttempt(){
+		attempts++;
+	}
 }
