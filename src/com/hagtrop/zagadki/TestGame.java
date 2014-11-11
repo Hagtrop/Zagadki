@@ -3,15 +3,21 @@ package com.hagtrop.zagadki;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLayoutChangeListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +63,18 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			btn.setOnClickListener(new AnswerBtnsOnClickListener());
 		}
 		
+		//Выравниваем кнопки по ширине
+		answerBtns.get(5).addOnLayoutChangeListener(new OnLayoutChangeListener() {
+			int w0, w1;
+			@Override
+			public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+				w0 = answerBtns.get(0).getWidth();
+				w1 = answerBtns.get(1).getWidth();
+				if(w1 > w0) answerBtns.get(0).setWidth(w1);
+				else if(w0 > w1) answerBtns.get(1).setWidth(w0);
+			}
+		});
+		
 		baseHelper = BaseHelper.getInstance(this);
 		
 		//Если игра сохранена - загружаем, если нет - создаём новую
@@ -67,6 +85,24 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		database = baseHelper.getWritableDatabase();
 		getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this);
 	}
+	
+	
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		// TODO Auto-generated method stub
+		super.onWindowFocusChanged(hasFocus);
+		Button btn1, btn2;
+		int width1, width2;
+		btn1 = (Button) findViewById(R.id.a2_answerBtn1);
+		btn2 = (Button) findViewById(R.id.a2_answerBtn2);
+		width1 = btn1.getWidth();
+		width2 = btn2.getWidth();
+		if(width1 > width2) btn2.setWidth(width1);
+		else if(width2 > width1) btn1.setWidth(width2);
+	}
+
+
 
 	@Override
 	public void onClick(View v) {
@@ -91,15 +127,19 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 					loadQuestion(queStatusList.get(currentQueIndex).getId());
 					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
 				}
+				else if(currentQueIndex >= queStatusList.size()-1){
+					Toast.makeText(getApplicationContext(), "Вы отгадали все загадки!", Toast.LENGTH_LONG).show();
+					endGame();
+					//выходим из метода, иначе отработает if(attemptsRemaining < 1)
+					return;
+				}
 			}
 			else{
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), buttonsPressed, 0);
 			}
 			if(attemptsRemaining < 1){
 				Toast.makeText(getApplicationContext(), "Попытки закончились", Toast.LENGTH_LONG).show();
-				baseHelper.deleteTestGame();
-				baseHelper.close();
-				finish();
+				endGame();
 			}
 		}
 		
@@ -181,7 +221,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 				//Выводим слова на кнопки
 				for(int j=0; j<answerBtns.size(); j++){
 					answerBtns.get(j).setEnabled(true);
-					answerBtns.get(j).setText(variants[j]);
+					answerBtns.get(j).setText(variants[j]);	
 				}
 			}
 			break;
@@ -195,10 +235,16 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 	}
 	
 	//Асинхронно загружаем вопрос, используя LoaderManager
-		private void loadQuestion(int queId){
-			Bundle bundle = new Bundle();
-			bundle.putInt("queId", queId);
-			getSupportLoaderManager().restartLoader(QUESTION_LOADER, bundle, this);
-			getSupportLoaderManager().restartLoader(VARIANTS_LOADER, bundle, this);
-		}
+	private void loadQuestion(int queId){
+		Bundle bundle = new Bundle();
+		bundle.putInt("queId", queId);
+		getSupportLoaderManager().restartLoader(QUESTION_LOADER, bundle, this);
+		getSupportLoaderManager().restartLoader(VARIANTS_LOADER, bundle, this);
+	}
+	
+	void endGame(){
+		baseHelper.deleteTestGame();
+		baseHelper.close();
+		finish();
+	}
 }
