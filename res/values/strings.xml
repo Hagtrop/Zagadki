@@ -25,5 +25,7 @@
     <string name="message_false">Неверно!</string>
     <string name="message_gemeover">Поздравляем!\nВы отгадали все загадки.</string>
     <string name="gameover_dialog_okBtn">Я молодец!</string>
+    <string name="message_no_attempts">У вас не осталось попыток.\nИгра окончена.</string>
+    <string name="no_attempts_dialog_okBtn">Вернуться в меню</string>
 
 </resources>

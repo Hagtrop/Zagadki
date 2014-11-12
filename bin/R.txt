@@ -320,6 +320,8 @@ int id listMode 0x7f060001
 int id list_item 0x7f060059
 int id middle 0x7f060012
 int id never 0x7f060009
+int id no_attempts_dialog_TV 0x7f060075
+int id no_attempts_dialog_okBtn 0x7f060076
 int id none 0x7f060010
 int id normal 0x7f060000
 int id progress_circular 0x7f060018
@@ -349,7 +351,7 @@ int id tableRow4 0x7f060070
 int id title 0x7f06005b
 int id top_action_bar 0x7f060050
 int id true_dialog 0x7f06006f
-int id true_dialog_TV 0x7f060075
+int id true_dialog_TV 0x7f060077
 int id up 0x7f060051
 int id useLogo 0x7f060003
 int id withText 0x7f06000c
@@ -383,8 +385,9 @@ int layout abc_simple_decor 0x7f030019
 int layout activity_main 0x7f03001a
 int layout false_dialog 0x7f03001b
 int layout gameover_dialog 0x7f03001c
-int layout support_simple_spinner_dropdown_item 0x7f03001d
-int layout true_dialog 0x7f03001e
+int layout no_attempts_dialog 0x7f03001d
+int layout support_simple_spinner_dropdown_item 0x7f03001e
+int layout true_dialog 0x7f03001f
 int string a0_countdownBtn 0x7f0b0010
 int string a0_sandsBtn 0x7f0b0011
 int string a0_simpleBtn 0x7f0b000e
@@ -417,7 +420,9 @@ int string app_name 0x7f0b000d
 int string gameover_dialog_okBtn 0x7f0b0020
 int string message_false 0x7f0b001e
 int string message_gemeover 0x7f0b001f
+int string message_no_attempts 0x7f0b0021
 int string message_true 0x7f0b001d
+int string no_attempts_dialog_okBtn 0x7f0b0022
 int style AnswerLetterBtn 0x7f0c008b
 int style AppBaseTheme 0x7f0c008c
 int style AppTheme 0x7f0c008d

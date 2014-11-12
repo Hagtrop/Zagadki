@@ -8,7 +8,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.Editable;
@@ -22,7 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TestGame extends FragmentActivity implements OnClickListener, LoaderCallbacks<Cursor>{
+public class TestGame extends FragmentActivity implements OnClickListener, LoaderCallbacks<Cursor>, NoticeDialogListener{
 	TextView progressTV, levelTV, attemptsTV, questionTV, answerTV;
 	
 	ArrayList<Button> answerBtns;
@@ -65,8 +67,10 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		//Выравниваем кнопки по ширине
 		answerBtns.get(5).addOnLayoutChangeListener(new OnLayoutChangeListener() {
 			int w0, w1;
+			boolean changed = false;
 			@Override
 			public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+				Log.d("mLog", "onLayoutChange");
 				w0 = answerBtns.get(0).getWidth();
 				w1 = answerBtns.get(1).getWidth();
 				if(w1 > w0) answerBtns.get(0).setWidth(w1);
@@ -84,24 +88,6 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		database = baseHelper.getWritableDatabase();
 		getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this);
 	}
-	
-	
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		// TODO Auto-generated method stub
-		super.onWindowFocusChanged(hasFocus);
-		Button btn1, btn2;
-		int width1, width2;
-		btn1 = (Button) findViewById(R.id.a2_answerBtn1);
-		btn2 = (Button) findViewById(R.id.a2_answerBtn2);
-		width1 = btn1.getWidth();
-		width2 = btn2.getWidth();
-		if(width1 > width2) btn2.setWidth(width1);
-		else if(width2 > width1) btn1.setWidth(width2);
-	}
-
-
 
 	@Override
 	public void onClick(View v) {
@@ -127,8 +113,10 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
 				}
 				else if(currentQueIndex >= queStatusList.size()-1){
-					Toast.makeText(getApplicationContext(), "Вы отгадали все загадки!", Toast.LENGTH_LONG).show();
-					endGame();
+					//Выводим сообщение о том, что игра закончена
+					FragmentManager fManager = getSupportFragmentManager();
+					GameoverDialog gameoverDialog = new GameoverDialog();
+					gameoverDialog.show(fManager, "gameover_dialog");
 					//выходим из метода, иначе отработает if(attemptsRemaining < 1)
 					return;
 				}
@@ -137,8 +125,10 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), queStatusList.get(currentQueIndex).getAttempts(), 0);
 			}
 			if(attemptsRemaining < 1){
-				Toast.makeText(getApplicationContext(), "Попытки закончились", Toast.LENGTH_LONG).show();
-				endGame();
+				//Выводим сообщение о том, что попытки закончились
+				FragmentManager fManager = getSupportFragmentManager();
+				NoAttemptsDialog noAttemptsDialog = new NoAttemptsDialog();
+				noAttemptsDialog.show(fManager, "no_attempts_dialog");
 			}
 		}
 		
@@ -245,5 +235,16 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 		baseHelper.deleteTestGame();
 		baseHelper.close();
 		finish();
+	}
+
+	@Override
+	public void onDialogDismiss(DialogFragment dialog, String dialogType) {
+		if(dialogType.equals(GameoverDialog.DIALOG_TYPE)){
+			//Возвращаемся в меню выбора типа игры
+			endGame();
+		}
+		else if(dialogType.equals(NoAttemptsDialog.DIALOG_TYPE)){
+			endGame();
+		}
 	}
 }
