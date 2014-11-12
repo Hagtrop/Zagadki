@@ -246,6 +246,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			int emtyBtnNum = answerBtns.getFirstEmptyBtn();
 			if(emtyBtnNum > -1){
 				focusBtnNum = emtyBtnNum;
+				checkBtn.setEnabled(false);
 			}
 			else checkBtn.setEnabled(true);
 		}
@@ -275,6 +276,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				if(currentQueIndex < queStatusList.size()-1){
 					currentQueIndex++;
 					loadQuestion(queStatusList.get(currentQueIndex).getId());
+					checkBtn.setEnabled(false);
 					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
 				}
 				else{
