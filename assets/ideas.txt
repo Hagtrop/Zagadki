@@ -1,0 +1,31 @@
+------------------------
+[1]
+Оставить 2 варианта игры: "простая игра" и "с выбором ответа".
+Для вариантов "обратный отсчёт" и "пески времени"  кнопки заменить на чекбоксы или радиокнопки, сделать эти режимы опциями основных 2х режимов.
+------------------------
+[2]
+В простой игре анимировать появление кнопок с вариантами букв, например пусть вылетают из одной точки. Смену текста загадки можно анимировать перелистыванием.
+------------------------
+[3]
+Реализовать таймер. См. http://stackoverflow.com/questions/4597690/android-timer-how
+
+Handler handler = new Handler();
+MyTimer timer = new MyTimer(handler, tv1);
+handler.postDelayed(timer, 0);
+
+class MyTimer implements Runnable{
+	Handler h;
+	TextView tv;
+	
+	MyTimer(Handler h, TextView tv){
+		this.tv = tv;
+		this.h = h;
+	}
+
+	@Override
+	public void run() {
+		tv.setText(String.valueOf(System.currentTimeMillis()));
+		h.postDelayed(this, 500);
+	}
+}
+------------------------
