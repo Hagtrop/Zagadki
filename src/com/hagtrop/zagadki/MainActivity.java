@@ -9,9 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 public class MainActivity extends Activity implements OnClickListener{
 	Button simpleBtn, variantsBtn, countdownBtn, sandsBtn;
+	CheckBox countdownChBx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,8 @@ public class MainActivity extends Activity implements OnClickListener{
         sandsBtn = (Button) findViewById(R.id.a0_sandsBtn);
         sandsBtn.setOnClickListener(this);
         
+        countdownChBx = (CheckBox) findViewById(R.id.a0_countdownChBx);
+        
         BaseHelper bh = BaseHelper.getInstance(this);
         bh.printData();
         SQLiteDatabase db = bh.getWritableDatabase();
@@ -42,9 +46,12 @@ public class MainActivity extends Activity implements OnClickListener{
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
+		Intent intent;
 		switch(v.getId()){
 		case R.id.a0_simpleBtn:
-			startActivity(new Intent(this, SimpleGame.class));
+			intent = new Intent(this, SimpleGame.class);
+			if(countdownChBx.isChecked()) intent.putExtra("timer", true);
+			startActivity(intent);
 			break;
 		case R.id.a0_variantsBtn:
 			startActivity(new Intent(this, TestGame.class));

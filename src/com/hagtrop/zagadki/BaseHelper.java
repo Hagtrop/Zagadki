@@ -67,7 +67,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 	public void newSimpleGame(){
 		String deleteQuery, createQuery;
 		deleteQuery = "DROP TABLE IF EXISTS simple_game";
-		createQuery = "CREATE TABLE simple_game(question_id INTEGER, status INTEGER DEFAULT 0)";
+		createQuery = "CREATE TABLE simple_game(question_id INTEGER, status INTEGER DEFAULT 0, time INTEGER DEFAULT 0)";
 		SQLiteDatabase database = getWritableDatabase();
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);
@@ -110,7 +110,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 	public void newTestGame(){
 		String deleteQuery, createQuery;
 		deleteQuery = "DROP TABLE IF EXISTS test_game";
-		createQuery = "CREATE TABLE test_game(question_id INTEGER, status INTEGER DEFAULT 0, attempts INTEGER DEFAULT 0)";
+		createQuery = "CREATE TABLE test_game(question_id INTEGER, status INTEGER DEFAULT 0, attempts INTEGER DEFAULT 0, time INTEGER DEFAULT 0)";
 		SQLiteDatabase database = getWritableDatabase();
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);

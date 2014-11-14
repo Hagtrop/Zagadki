@@ -63,4 +63,10 @@
             android:text="@string/a0_sandsBtn" />
     </TableRow>
 
+    <CheckBox
+        android:id="@+id/a0_countdownChBx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/a0_countdownChBx" />
+
 </TableLayout>

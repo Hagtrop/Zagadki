@@ -7,6 +7,7 @@
     <string name="a0_variantsBtn">С выбором ответа</string>
     <string name="a0_countdownBtn">Обратный отсчёт</string>
     <string name="a0_sandsBtn">Пески времени</string>
+    <string name="a0_countdownChBx">Обратный отсчёт</string>
     
     <string name="a1_progressTV">Прогресс:</string>
     <string name="a1_levelTV">Уровень</string>

@@ -39,11 +39,15 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
 	private Question currentQuestion;
+	private boolean useTimer = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
+		
+		Bundle extras = getIntent().getExtras();
+		if(extras != null) useTimer = extras.getBoolean("timer");
 		
 		progressTV = (TextView) findViewById(R.id.a1_progressTV);
 		levelTV = (TextView) findViewById(R.id.a1_levelTV);
@@ -177,6 +181,8 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				
 				//Устанавливаем фокус в позицию 0
 				focusBtnNum = 0;
+				
+				//Запускаем таймер
 				
 				break;
 			}
