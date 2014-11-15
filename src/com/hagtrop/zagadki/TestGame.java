@@ -39,6 +39,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 	private Question currentQuestion;
 	private String[] variants;
 	private int attemptsRemaining;
+	private long totalTimeSpent = 0;
 	
 	
 
@@ -102,7 +103,7 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			Button btn = (Button) v;
 			btn.setEnabled(false);
 			attemptsRemaining--;
-			queStatusList.get(currentQueIndex).addAttempt();
+			queStatusList.get(currentQueIndex).addAttempts(1);
 			attemptsTV.setText(getString(R.string.a2_attemptsTV) + " " + attemptsRemaining);
 			if(btn.getText().equals(currentQuestion.getAnswer())){
 				baseHelper.updateTestGame(queStatusList.get(currentQueIndex).getId(), queStatusList.get(currentQueIndex).getAttempts(), 1);
@@ -161,13 +162,17 @@ public class TestGame extends FragmentActivity implements OnClickListener, Loade
 			if(cursor.moveToFirst()){
 				queStatusList = new ArrayList<QueStatus>();
 				int queAttempts;
+				long queTimeSpent;
 				int attemptsMade = 0;
 				do{
 					queAttempts = cursor.getInt(cursor.getColumnIndex("attempts"));
 					attemptsMade += queAttempts;
+					queTimeSpent = cursor.getLong(cursor.getColumnIndex("time"));
+					totalTimeSpent += queTimeSpent;
 					queStatusList.add(new QueStatus(
 							cursor.getInt(cursor.getColumnIndex("question_id")), 
 							cursor.getInt(cursor.getColumnIndex("status")), 
+							queTimeSpent,
 							queAttempts));
 					
 				} while(cursor.moveToNext());

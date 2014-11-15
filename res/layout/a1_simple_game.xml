@@ -29,6 +29,12 @@
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/a1_timeTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/a1_timeTV" />
+
+    <TextView
         android:id="@+id/a1_questionTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

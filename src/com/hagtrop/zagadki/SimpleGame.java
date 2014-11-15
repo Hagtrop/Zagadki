@@ -8,6 +8,8 @@ import java.util.Random;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -21,25 +23,34 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
-	TextView questionTV, answerTV, progressTV, levelTV;
+	TextView questionTV, answerTV, progressTV, levelTV, timeTV;
 	Button nextBtn, checkBtn;
 	LinearLayout answerLayout;
 	
 	private static final int ARRAY_LOADER = 0;
 	private static final int QUESTION_LOADER = 1;
+	
+	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
+	private Random random = new Random();
+	
 	private ArrayList<QueStatus> queStatusList;
 	private SQLiteDatabase database;
-	private int currentQueIndex = 0;
+	
 	private ArrayList<Button> lettersBtns;
 	private AnswerButtonsArray answerBtns;
 	private char[] answerLetters;
-	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
-	private Random random = new Random();
+
 	private int focusBtnNum = 0;
+	private int currentQueIndex = 0;
+	private long totalTimeSpent = 0;
+	private long timeLimit;
+	private Question currentQuestion;
+	
 	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
-	private Question currentQuestion;
 	private boolean useTimer = false;
+	private Handler handler;
+	private MyTimer timer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +62,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		
 		progressTV = (TextView) findViewById(R.id.a1_progressTV);
 		levelTV = (TextView) findViewById(R.id.a1_levelTV);
+		timeTV = (TextView) findViewById(R.id.a1_timeTV);
+		//Отображаем таймер, если выбран режим с таймером
+		if(useTimer) timeTV.setVisibility(View.VISIBLE);
+		else timeTV.setVisibility(View.GONE);
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
 		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
@@ -127,12 +142,17 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		case ARRAY_LOADER:
 			if(cursor.moveToFirst()){
 				queStatusList = new ArrayList<QueStatus>();
-				int queId, queStatus;
+				long timeSpent;
 				do{
-					queId = cursor.getInt(cursor.getColumnIndex("question_id"));
-					queStatus = cursor.getInt(cursor.getColumnIndex("status"));
-					queStatusList.add(new QueStatus(queId, queStatus));
+					timeSpent = cursor.getLong(cursor.getColumnIndex("time"));
+					totalTimeSpent += timeSpent;
+					queStatusList.add(new QueStatus(
+							cursor.getInt(cursor.getColumnIndex("question_id")),
+							cursor.getInt(cursor.getColumnIndex("status")),
+							timeSpent));
+					
 				} while(cursor.moveToNext());
+				timeLimit = 10 * 1000 * queStatusList.size();
 			}
 			while(currentQueIndex < queStatusList.size() && queStatusList.get(currentQueIndex).getStatus() != 0){
 				currentQueIndex++;
@@ -183,6 +203,18 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				focusBtnNum = 0;
 				
 				//Запускаем таймер
+				if(useTimer){
+					Handler.Callback hCallback = new Handler.Callback() {	
+						@Override
+						public boolean handleMessage(Message msg) {
+							if(msg.what == 0) Log.d("mLog", "TIME LEFT 0");
+							return false;
+						}
+					};
+					handler = new Handler(hCallback);
+					timer = new MyTimer(handler, timeTV, timeLimit-totalTimeSpent);
+					handler.postDelayed(timer, 0);
+				}
 				
 				break;
 			}
@@ -218,6 +250,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 			Log.d("mLog", "Answer: " + answerBtns.getPlayerAnswer());
 			if(answerBtns.getPlayerAnswer().equals(currentQuestion.getAnswer())){
 				playerAnswerTrue = true;
+				handler.removeCallbacks(timer);
 				//Вывод следующего вопроса в методе onDialogDismiss
 			}
 			else{
@@ -412,4 +445,10 @@ class AnswerButtonsArray{
 	/*void setFocusedBg(int position){
 		buttons.get(position).setBackground(android.R.drawable.btn_default_small_pressed);
 	}*/
+}
+
+class GameInfo{
+	long timeLimit, queTimeSpent, totalTimeSpent;
+	int currentQueNum, currentQueId;
+	boolean useTimer;
 }

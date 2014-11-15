@@ -11,6 +11,7 @@
     
     <string name="a1_progressTV">Прогресс:</string>
     <string name="a1_levelTV">Уровень</string>
+    <string name="a1_timeTV">00:00</string>
     <string name="a1_questionTV">Текст загадки</string>
     <string name="a1_answerTV">Текст ответа</string>
     <string name="a1_checkBtn">Проверить</string>
