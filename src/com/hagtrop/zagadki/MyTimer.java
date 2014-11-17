@@ -9,12 +9,13 @@ import android.widget.TextView;
 public class MyTimer implements Runnable{
 	private Handler handler;
 	private TextView textView;
-	private long timeLeft, startTime, hours, minutes, seconds;
+	private long startTime, hours, minutes, seconds;
+	private final long TIME_LEFT;
 	
-	MyTimer(Handler handler, TextView textView, long timeLeft, Long timePassed){
+	MyTimer(Handler handler, TextView textView, GameInfo gameInfo){
 		this.handler = handler;
 		this.textView = textView;
-		this.timeLeft = timeLeft;
+		TIME_LEFT
 		this.startTime = System.currentTimeMillis();
 	}
 	

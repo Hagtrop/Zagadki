@@ -48,23 +48,25 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
-	private boolean useTimer = false;
 	private Handler handler;
 	private MyTimer timer;
+	private GameInfo gameInfo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
 		
+		gameInfo = new GameInfo();
+		
 		Bundle extras = getIntent().getExtras();
-		if(extras != null) useTimer = extras.getBoolean("timer");
+		if(extras != null) gameInfo.useTimer = extras.getBoolean("timer");
 		
 		progressTV = (TextView) findViewById(R.id.a1_progressTV);
 		levelTV = (TextView) findViewById(R.id.a1_levelTV);
 		timeTV = (TextView) findViewById(R.id.a1_timeTV);
 		//Отображаем таймер, если выбран режим с таймером
-		if(useTimer) timeTV.setVisibility(View.VISIBLE);
+		if(gameInfo.useTimer) timeTV.setVisibility(View.VISIBLE);
 		else timeTV.setVisibility(View.GONE);
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
@@ -203,7 +205,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				focusBtnNum = 0;
 				
 				//Запускаем таймер
-				if(useTimer){
+				if(gameInfo.useTimer){
 					Handler.Callback hCallback = new Handler.Callback() {	
 						@Override
 						public boolean handleMessage(Message msg) {
@@ -448,7 +450,11 @@ class AnswerButtonsArray{
 }
 
 class GameInfo{
-	long timeLimit, queTimeSpent, totalTimeSpent;
+	long timeLimit, queTimeSpent, totalTimeSpent, queStartTime, queEndTime;
 	int currentQueNum, currentQueId;
 	boolean useTimer;
+	
+	long getQueTimeSpent(){
+		return queEndTime - 
+	}
 }
