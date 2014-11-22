@@ -24,7 +24,9 @@ public class BaseHelper extends SQLiteOpenHelper {
 	private static File BASE_FILE;
 	private static BaseHelper bhInstance;
 	private boolean simpleGameExists = false;
+	private boolean simpleTimerGameExists = false;
 	private boolean testGameExists = false;
+	private String tableName;
 	
 	synchronized static public BaseHelper getInstance(Context context){
 		Log.d("mLog", "BaseHelper getInstance");
@@ -60,14 +62,18 @@ public class BaseHelper extends SQLiteOpenHelper {
 
 	}
 	
-	public void deleteSimpleGame(){
-		simpleGameExists = false;
+	public void deleteSimpleGame(boolean useTimer){
+		if(useTimer) simpleTimerGameExists = false;
+		else simpleGameExists = false;
 	}
 	
-	public void newSimpleGame(){
+	public void newSimpleGame(boolean useTimer){
+		Log.d("mLog", "In newSimpleGame()");
 		String deleteQuery, createQuery;
-		deleteQuery = "DROP TABLE IF EXISTS simple_game";
-		createQuery = "CREATE TABLE simple_game(question_id INTEGER, status INTEGER DEFAULT 0, time INTEGER DEFAULT 0)";
+		if(useTimer) tableName = "simple_timer_game";
+		else tableName = "simple_game";
+		deleteQuery = "DROP TABLE IF EXISTS " + tableName;
+		createQuery = "CREATE TABLE " + tableName + "(question_id INTEGER, status INTEGER DEFAULT 0, time INTEGER DEFAULT 0)";
 		SQLiteDatabase database = getWritableDatabase();
 		database.execSQL(deleteQuery);
 		database.execSQL(createQuery);
@@ -90,7 +96,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 				for(QueParams params : quesParams){
 					cv = new ContentValues();
 					cv.put("question_id", params.queId);
-					database.insert("simple_game", null, cv);
+					database.insert(tableName, null, cv);
 				}
 				database.setTransactionSuccessful();
 			}
@@ -100,7 +106,8 @@ public class BaseHelper extends SQLiteOpenHelper {
 			
 		}
 		database.close();
-		simpleGameExists = true;
+		if(useTimer) simpleTimerGameExists = true;
+		else simpleGameExists = true;
 	}
 	
 	public void deleteTestGame(){
@@ -148,8 +155,9 @@ public class BaseHelper extends SQLiteOpenHelper {
 	
 	
 	
-	public boolean simpleGameExists(){
-		return simpleGameExists;
+	public boolean simpleGameExists(boolean useTimer){
+		if(useTimer) return simpleTimerGameExists;
+		else return simpleGameExists;
 	}
 	
 	public boolean testGameExists(){
@@ -188,11 +196,16 @@ public class BaseHelper extends SQLiteOpenHelper {
 	    }
 	}
 	
-	void updateSimpleGame(int queId){
+	void updateSimpleGame(int queId, int status, long time, boolean useTimer){
+		Log.d("mLog", "In updateSimpleGame(" + queId + ", " + status + ", " + time + ")");
 		SQLiteDatabase database = getWritableDatabase();
-		ContentValues cv = new ContentValues();
+		/*ContentValues cv = new ContentValues();
 		cv.put("status", 1);
-		database.update("simple_game", cv, "question_id=?", new String[]{String.valueOf(queId)});
+		database.update("simple_game", cv, "question_id=?", new String[]{String.valueOf(queId)});*/
+		database.execSQL("UPDATE " + tableName+ " SET status=?, time=time+? WHERE question_id=?", new String[]{
+				String.valueOf(status), 
+				String.valueOf(time), 
+				String.valueOf(queId)});
 	}
 	
 	void updateTestGame(int queId, int attempts, int status){

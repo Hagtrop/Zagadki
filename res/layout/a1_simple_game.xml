@@ -249,12 +249,4 @@
         android:enabled="false"
         android:text="@string/a1_checkBtn" />
 
-    <Button
-        android:id="@+id/a1_nextBtn"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="48dip"
-        android:text="@string/a1_nextBtn" />
-
 </LinearLayout>

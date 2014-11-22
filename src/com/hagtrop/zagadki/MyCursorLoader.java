@@ -5,30 +5,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
+import android.util.Log;
 
 public class MyCursorLoader extends CursorLoader{
 	public static final int SIMPLE_GAME_QUES = 0;
 	public static final int QUE_AND_ANSWER = 1;
 	public static final int VARIANTS = 2;
 	public static final int TEST_GAME_QUES = 3;
+	public static final int SIMPLE_TIMER_GAME_QUES = 4;
 	private int queryIndex;
 	
-	
-	
-	private static final String QUESTIONS_TABLE = "questions";
-	private static final String QUESTION_COLUMN = "questions.question";
-	private static final String QUESTION_ID_COLUMN = "questions._id";
-	private static final String QUESTION_LEVEL_COLUMN = "questions.level";
-	private static final String QANSWER_ID_COLUMN = "questions.answer_id";
-	
-	private static final String ANSWERS_TABLE = "answers";
-	private static final String ANSWER_COLUMN = "answers.answer";
-	private static final String ANSWER_ID_COLUMN = "answers._id";
-	
 	private static final String SIMPLE_GAME_TABLE = "simple_game";
-	private static final String SIMPLE_GAME_ID_COLUMN = "simple_game.question_id";
-	private static final String SIMPLE_GAME_STATUS_COLUMN = "simple_game.status";
-	
+	private static final String SIMPLE_TIMER_GAME_TABLE = "simple_timer_game";
 	private static final String TEST_GAME_TABLE = "test_game";
 	
 	private static final String GET_QA_SQL = 
@@ -47,25 +35,14 @@ public class MyCursorLoader extends CursorLoader{
 	private SQLiteDatabase database;
 	private int questionId;
 	
-	/*public MyCursorLoader(Context context, SQLiteDatabase database){
-		super(context);
-		queryIndex = SORTED_QUES;
-		this.database = database;
-	}
-	
-	public MyCursorLoader(Context context, SQLiteDatabase database, int queId){
-		super(context);
-		queryIndex = QUE_AND_ANSWER;
-		this.database = database;
-		this.questionId = queId;
-	}*/
-	
 	public MyCursorLoader(Context context, SQLiteDatabase database, int queryIndex, Bundle params){
 		super(context);
 		this.database = database;
 		this.queryIndex = queryIndex;
 		switch(queryIndex){
 		case SIMPLE_GAME_QUES:
+			break;
+		case SIMPLE_TIMER_GAME_QUES:
 			break;
 		case TEST_GAME_QUES:
 			break;
@@ -84,6 +61,9 @@ public class MyCursorLoader extends CursorLoader{
 		switch(queryIndex){
 		case SIMPLE_GAME_QUES:
 			cursor = database.query(SIMPLE_GAME_TABLE, null, null, null, null, null, null);
+			break;
+		case SIMPLE_TIMER_GAME_QUES:
+			cursor = database.query(SIMPLE_TIMER_GAME_TABLE, null, null, null, null, null, null);
 			break;
 		case TEST_GAME_QUES:
 			cursor = database.query(TEST_GAME_TABLE, null, null, null, null, null, null);

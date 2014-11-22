@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -21,35 +22,28 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
 	TextView questionTV, answerTV, progressTV, levelTV, timeTV;
-	Button nextBtn, checkBtn;
+	Button checkBtn;
 	LinearLayout answerLayout;
 	
 	private static final int ARRAY_LOADER = 0;
 	private static final int QUESTION_LOADER = 1;
-	
 	private static final char[] RUS_ALPHABET = new char[]{'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
 	private Random random = new Random();
-	
 	private ArrayList<QueStatus> queStatusList;
 	private SQLiteDatabase database;
-	
 	private ArrayList<Button> lettersBtns;
 	private AnswerButtonsArray answerBtns;
 	private char[] answerLetters;
-
 	private int focusBtnNum = 0;
-	private int currentQueIndex = 0;
-	private long totalTimeSpent = 0;
-	private long timeLimit;
 	private Question currentQuestion;
-	
-	private boolean playerAnswerTrue;
 	private BaseHelper baseHelper;
 	private Handler handler;
 	private MyTimer timer;
+	
 	private GameInfo gameInfo;
 	
 	@Override
@@ -57,21 +51,20 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a1_simple_game);
 		
-		gameInfo = new GameInfo();
-		
 		Bundle extras = getIntent().getExtras();
-		if(extras != null) gameInfo.useTimer = extras.getBoolean("timer");
+		if(extras != null) gameInfo = new GameInfo(extras.getBoolean("timer"));
+		else gameInfo = new GameInfo(false);
 		
 		progressTV = (TextView) findViewById(R.id.a1_progressTV);
 		levelTV = (TextView) findViewById(R.id.a1_levelTV);
 		timeTV = (TextView) findViewById(R.id.a1_timeTV);
+		
 		//Отображаем таймер, если выбран режим с таймером
-		if(gameInfo.useTimer) timeTV.setVisibility(View.VISIBLE);
+		if(gameInfo.USE_TIMER) timeTV.setVisibility(View.VISIBLE);
 		else timeTV.setVisibility(View.GONE);
+		
 		questionTV = (TextView) findViewById(R.id.a1_questionTV);
 		answerTV = (TextView) findViewById(R.id.a1_answerTV);
-		nextBtn = (Button) findViewById(R.id.a1_nextBtn);
-		nextBtn.setOnClickListener(this);
 		checkBtn = (Button) findViewById(R.id.a1_checkBtn);
 		checkBtn.setOnClickListener(this);
 		answerLayout = (LinearLayout) findViewById(R.id.a1_answerLayout);
@@ -113,23 +106,36 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		baseHelper = BaseHelper.getInstance(this);
 		
 		//Если игра сохранена - загружаем, если нет - создаём новую
-		if(!baseHelper.simpleGameExists()){
-			baseHelper.newSimpleGame();
-			Log.d("mLog", "STEP: getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this)");	
+		if(!baseHelper.simpleGameExists(gameInfo.USE_TIMER)){
+			baseHelper.newSimpleGame(gameInfo.USE_TIMER);
 		}
 		database = baseHelper.getWritableDatabase();
 		getSupportLoaderManager().initLoader(ARRAY_LOADER, null, this);
 	}
+	
+	
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		handler.removeCallbacks(timer);
+		baseHelper.updateSimpleGame(
+				queStatusList.get(gameInfo.getQueIndex()).getId(), 
+				gameInfo.goodAnswer() ? 1 : 0, 
+				gameInfo.getQueTimePassed(),
+				gameInfo.USE_TIMER);
+	}
+
+
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
-		Log.d("mLog", "onCreateLoader");
 		Bundle params;
 		switch(loaderID){
 		case ARRAY_LOADER:
-			return new MyCursorLoader(this, database, MyCursorLoader.SIMPLE_GAME_QUES, null);
+			if(gameInfo.USE_TIMER) return new MyCursorLoader(this, database, MyCursorLoader.SIMPLE_TIMER_GAME_QUES, null);
+			else return new MyCursorLoader(this, database, MyCursorLoader.SIMPLE_GAME_QUES, null);
 		case QUESTION_LOADER:
-			Log.d("mLog", "onCreateLoader, queId=" + bundle.getInt("queId"));
 			params = new Bundle();
 			params.putInt("questionId", bundle.getInt("queId"));
 			return new MyCursorLoader(this, database, MyCursorLoader.QUE_AND_ANSWER, params);
@@ -144,23 +150,31 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		case ARRAY_LOADER:
 			if(cursor.moveToFirst()){
 				queStatusList = new ArrayList<QueStatus>();
-				long timeSpent;
+				long queTimeSpent;
+				int queStatus;
+				int queIndex = -1;
+				boolean nextFound = false;
 				do{
-					timeSpent = cursor.getLong(cursor.getColumnIndex("time"));
-					totalTimeSpent += timeSpent;
+					queIndex++;
+					queTimeSpent = cursor.getLong(cursor.getColumnIndex("time"));
+					gameInfo.setTimePassed(gameInfo.getTimePassed() + queTimeSpent);
+					queStatus = cursor.getInt(cursor.getColumnIndex("status"));
+					//Определяем номер первой неотвеченной загадки
+					if(!nextFound && queStatus == 0){
+						gameInfo.setQueIndex(queIndex);
+						nextFound = true;
+					}
 					queStatusList.add(new QueStatus(
 							cursor.getInt(cursor.getColumnIndex("question_id")),
-							cursor.getInt(cursor.getColumnIndex("status")),
-							timeSpent));
+							queStatus,
+							queTimeSpent));
 					
 				} while(cursor.moveToNext());
-				timeLimit = 10 * 1000 * queStatusList.size();
-			}
-			while(currentQueIndex < queStatusList.size() && queStatusList.get(currentQueIndex).getStatus() != 0){
-				currentQueIndex++;
+				
+				gameInfo.setTimeLimit(10 * 1000 * queStatusList.size());
 			}
 			printArray(queStatusList);
-			loadQuestion(queStatusList.get(currentQueIndex).getId());
+			loadQuestion(queStatusList.get(gameInfo.getQueIndex()).getId());
 			break;
 		//Извлекаем вопрос и ответ
 		case QUESTION_LOADER:
@@ -170,13 +184,10 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 						cursor.getString(cursor.getColumnIndex("answer")).trim().toUpperCase(new Locale("ru")),
 						cursor.getInt(cursor.getColumnIndex("level")));
 				
-				Log.d("mLog", currentQuestion.getQuestion());
-				Log.d("mLog", currentQuestion.getAnswer());
-				progressTV.setText(getString(R.string.a1_progressTV) + " " + (currentQueIndex+1) + "/" + queStatusList.size());
+				progressTV.setText(getString(R.string.a1_progressTV) + " " + (gameInfo.getQueIndex()+1) + "/" + queStatusList.size());
 				levelTV.setText(getString(R.string.a1_levelTV) + " " + currentQuestion.getLevel());
 				questionTV.setText(currentQuestion.getQuestion());
 				answerTV.setText(currentQuestion.getAnswer());
-				Log.d("mLog", "QUESTION_LOADER");
 				answerLetters = currentQuestion.getAnswer().toCharArray();
 				answerBtns.setVisible(answerLetters.length);
 				
@@ -205,23 +216,34 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 				focusBtnNum = 0;
 				
 				//Запускаем таймер
-				if(gameInfo.useTimer){
-					Handler.Callback hCallback = new Handler.Callback() {	
-						@Override
-						public boolean handleMessage(Message msg) {
-							if(msg.what == 0) Log.d("mLog", "TIME LEFT 0");
-							return false;
+				Handler.Callback hCallback = new Handler.Callback() {	
+					@Override
+					public boolean handleMessage(Message msg) {
+						if(msg.what == 0 && gameInfo.USE_TIMER){
+							Log.d("mLog", "TIME LEFT 0");
+							endGame("Ваше время вышло");
 						}
-					};
-					handler = new Handler(hCallback);
-					timer = new MyTimer(handler, timeTV, timeLimit-totalTimeSpent);
-					handler.postDelayed(timer, 0);
-				}
+						return false;
+					}
+				};
+				handler = new Handler(hCallback);
+				timer = new MyTimer(handler, timeTV, gameInfo);
+				handler.postDelayed(timer, 1000);
 				
 				break;
 			}
 		default: break;
 		}
+	}
+	
+	void endGame(String message){
+		baseHelper.deleteSimpleGame(gameInfo.USE_TIMER);
+		baseHelper.close();
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+		FragmentManager fManager = getSupportFragmentManager();
+		GameoverDialog gameoverDialog = new GameoverDialog();
+		gameoverDialog.show(fManager, "gameover_dialog");
+		finish();
 	}
 	
 	//Асинхронно загружаем вопрос, используя LoaderManager
@@ -244,30 +266,26 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	}
 
 	@Override
-	//Загружаем следующий вопрос по клику на кнопке
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
 		case R.id.a1_checkBtn:
-			Log.d("mLog", "Answer: " + answerBtns.getPlayerAnswer());
 			if(answerBtns.getPlayerAnswer().equals(currentQuestion.getAnswer())){
-				playerAnswerTrue = true;
-				handler.removeCallbacks(timer);
+				gameInfo.goodAnswer(true);
 				//Вывод следующего вопроса в методе onDialogDismiss
 			}
 			else{
-				playerAnswerTrue = false;
+				gameInfo.goodAnswer(false);
 			}
+			handler.removeCallbacks(timer);
+			baseHelper.updateSimpleGame(
+					queStatusList.get(gameInfo.getQueIndex()).getId(), 
+					gameInfo.goodAnswer() ? 1 : 0, 
+					gameInfo.getQueTimePassed(),
+					gameInfo.USE_TIMER);
 			FragmentManager fManager = getSupportFragmentManager();
-			TrueFalseDialog dialog = new TrueFalseDialog(playerAnswerTrue);
+			TrueFalseDialog dialog = new TrueFalseDialog(gameInfo.goodAnswer());
 			dialog.show(fManager, "answer_result_dialog");
-			break;
-		case R.id.a1_nextBtn:
-			if(currentQueIndex < queStatusList.size()-1){
-				currentQueIndex++;
-				loadQuestion(queStatusList.get(currentQueIndex).getId());
-				Log.d("mLog", "currentQueIndex=" + currentQueIndex);
-			}
 			break;
 		default: break;
 		}
@@ -277,9 +295,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	class LettersOnClickListener implements OnClickListener{
 		@Override
 		public void onClick(View v) {
-			Log.d("mLog", "pressed id: " + v.getId());
 			Button btn = (Button) v;
-			Log.d("mLog", "pressed button id: " + btn.getId());
 			//Скрываем нажатую кнопку и пишем её букву на кнопке в строке ответа
 			btn.setVisibility(View.INVISIBLE);
 			answerBtns.setLetter(focusBtnNum, btn);
@@ -309,27 +325,21 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 
 	@Override
 	public void onDialogDismiss(DialogFragment dialog, String dialogType) {
-		Log.d("mLog", "Dialog dismissed");
 		if(dialogType.equals(TrueFalseDialog.DIALOG_TYPE)){
-			if(playerAnswerTrue){
-				baseHelper.updateSimpleGame(queStatusList.get(currentQueIndex).getId());
+			if(gameInfo.goodAnswer()){
 				//Загружаем следующий вопрос
-				if(currentQueIndex < queStatusList.size()-1){
-					currentQueIndex++;
-					loadQuestion(queStatusList.get(currentQueIndex).getId());
+				if(gameInfo.getQueIndex() < queStatusList.size()-1){
+					gameInfo.nextQue();
+					loadQuestion(queStatusList.get(gameInfo.getQueIndex()).getId());
 					checkBtn.setEnabled(false);
-					Log.d("mLog", "currentQueIndex=" + currentQueIndex);
+					Log.d("mLog", "currentQueIndex=" + gameInfo.getQueIndex());
 				}
 				else{
-					//Если вопросы кончились, удаляем таблицу текущей игры
-					baseHelper.deleteSimpleGame();
-					//Выводим сообщение о том, что игра закончена
-					FragmentManager fManager = getSupportFragmentManager();
-					GameoverDialog gameoverDialog = new GameoverDialog();
-					gameoverDialog.show(fManager, "gameover_dialog");
-					//Закрываем соединение с БД
-					baseHelper.close();
+					endGame("Вы ответили на все вопросы");
 				}
+			}
+			else{
+				handler.postDelayed(timer, 1000);
 			}
 		}
 		else if(dialogType.equals(GameoverDialog.DIALOG_TYPE)){
@@ -447,14 +457,4 @@ class AnswerButtonsArray{
 	/*void setFocusedBg(int position){
 		buttons.get(position).setBackground(android.R.drawable.btn_default_small_pressed);
 	}*/
-}
-
-class GameInfo{
-	long timeLimit, queTimeSpent, totalTimeSpent, queStartTime, queEndTime;
-	int currentQueNum, currentQueId;
-	boolean useTimer;
-	
-	long getQueTimeSpent(){
-		return queEndTime - 
-	}
 }

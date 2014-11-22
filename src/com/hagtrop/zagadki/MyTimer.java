@@ -9,38 +9,37 @@ import android.widget.TextView;
 public class MyTimer implements Runnable{
 	private Handler handler;
 	private TextView textView;
-	private long startTime, hours, minutes, seconds;
-	private final long TIME_LEFT;
+	private long hours, minutes, seconds;
+	private GameInfo gameInfo;
 	
 	MyTimer(Handler handler, TextView textView, GameInfo gameInfo){
 		this.handler = handler;
 		this.textView = textView;
-		TIME_LEFT
-		this.startTime = System.currentTimeMillis();
+		this.gameInfo = gameInfo;
 	}
 	
 	@Override
 	public void run() {
-		long tLeft = timeLeft - (System.currentTimeMillis() - startTime);
-		Log.d("mLog", "timeLeft: " + timeLeft);
+		gameInfo.addQueTimePassed(1000);
+		long timeLeft = gameInfo.getTimeLeft();
 		
-		if(tLeft <= 0){
+		if(timeLeft <= 0){
+			textView.setText("00:00:00");
 			handler.sendEmptyMessage(0);
 		}
 		else {
 			//Переводим в часы
-			hours = TimeUnit.MILLISECONDS.toHours(tLeft);
+			hours = TimeUnit.MILLISECONDS.toHours(timeLeft);
 			
 			//Вычисляем остаток и переводим в минуты
-			tLeft -= TimeUnit.HOURS.toMillis(hours);
-			minutes = TimeUnit.MILLISECONDS.toMinutes(tLeft);
+			timeLeft -= TimeUnit.HOURS.toMillis(hours);
+			minutes = TimeUnit.MILLISECONDS.toMinutes(timeLeft);
 			
 			//Вычисляем остаток и переводим в секунды
-			tLeft -= TimeUnit.MINUTES.toMillis(minutes);
-			seconds = TimeUnit.MILLISECONDS.toSeconds(tLeft);
+			timeLeft -= TimeUnit.MINUTES.toMillis(minutes);
+			seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeft);
 			
 			//Обновляем таймер на экране
-			Log.d("mLog", hours + ":" + minutes + ":" + seconds);
 			textView.setText(hours + ":" + minutes + ":" + seconds);
 			handler.postDelayed(this, 1000);
 		}
