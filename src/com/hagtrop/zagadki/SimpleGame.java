@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Cursor>, OnClickListener, NoticeDialogListener {
 	TextView questionTV, answerTV, progressTV, levelTV, timeTV;
@@ -221,7 +219,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 					public boolean handleMessage(Message msg) {
 						if(msg.what == 0 && gameInfo.USE_TIMER){
 							Log.d("mLog", "TIME LEFT 0");
-							endGame("Ваше время вышло");
+							showTimeIsOverMessage();
 						}
 						return false;
 					}
@@ -236,13 +234,21 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		}
 	}
 	
-	void endGame(String message){
-		baseHelper.deleteSimpleGame(gameInfo.USE_TIMER);
-		baseHelper.close();
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+	void showTimeIsOverMessage(){
+		FragmentManager fManager = getSupportFragmentManager();
+		TimeIsOverDialog dialog = new TimeIsOverDialog();
+		dialog.show(fManager, "time_is_over_dialog");
+	}
+	
+	void showEndGameDialog(){
 		FragmentManager fManager = getSupportFragmentManager();
 		GameoverDialog gameoverDialog = new GameoverDialog();
 		gameoverDialog.show(fManager, "gameover_dialog");
+	}
+	
+	void endGame(){
+		baseHelper.deleteSimpleGame(gameInfo.USE_TIMER);
+		baseHelper.close();
 		finish();
 	}
 	
@@ -335,16 +341,19 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 					Log.d("mLog", "currentQueIndex=" + gameInfo.getQueIndex());
 				}
 				else{
-					endGame("Вы ответили на все вопросы");
+					showEndGameDialog();
 				}
 			}
 			else{
 				handler.postDelayed(timer, 1000);
 			}
 		}
+		else if(dialogType.equals(TimeIsOverDialog.DIALOG_TYPE)){
+			endGame();
+		}
 		else if(dialogType.equals(GameoverDialog.DIALOG_TYPE)){
 			//Возвращаемся в меню выбора типа игры
-			finish();
+			endGame();
 		}
 	}
 }

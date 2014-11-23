@@ -29,5 +29,7 @@
     <string name="gameover_dialog_okBtn">Я молодец!</string>
     <string name="message_no_attempts">У вас не осталось попыток.\nИгра окончена.</string>
     <string name="no_attempts_dialog_okBtn">Вернуться в меню</string>
+    <string name="message_time_is_over">Ваше время вышло!</string>
+    <string name="time_is_over_dialog_okBtn">В главное меню</string>
 
 </resources>

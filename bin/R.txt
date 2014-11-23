@@ -349,10 +349,12 @@ int id tableRow1 0x7f06002c
 int id tableRow2 0x7f060032
 int id tableRow3 0x7f060038
 int id tableRow4 0x7f060070
+int id time_is_over_TV 0x7f060078
+int id time_is_over_dialog_okBtn 0x7f060079
 int id title 0x7f06005b
 int id top_action_bar 0x7f060050
 int id true_dialog 0x7f06006f
-int id true_dialog_TV 0x7f060078
+int id true_dialog_TV 0x7f06007a
 int id up 0x7f060051
 int id useLogo 0x7f060003
 int id withText 0x7f06000c
@@ -388,7 +390,8 @@ int layout false_dialog 0x7f03001b
 int layout gameover_dialog 0x7f03001c
 int layout no_attempts_dialog 0x7f03001d
 int layout support_simple_spinner_dropdown_item 0x7f03001e
-int layout true_dialog 0x7f03001f
+int layout time_is_over_dialog 0x7f03001f
+int layout true_dialog 0x7f030020
 int string a0_countdownBtn 0x7f0b0010
 int string a0_countdownChBx 0x7f0b0012
 int string a0_sandsBtn 0x7f0b0011
@@ -424,8 +427,10 @@ int string gameover_dialog_okBtn 0x7f0b0022
 int string message_false 0x7f0b0020
 int string message_gemeover 0x7f0b0021
 int string message_no_attempts 0x7f0b0023
+int string message_time_is_over 0x7f0b0025
 int string message_true 0x7f0b001f
 int string no_attempts_dialog_okBtn 0x7f0b0024
+int string time_is_over_dialog_okBtn 0x7f0b0026
 int style AnswerLetterBtn 0x7f0c008b
 int style AppBaseTheme 0x7f0c008c
 int style AppTheme 0x7f0c008d
