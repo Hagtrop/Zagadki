@@ -35,6 +35,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/a2_attemptsTV" />
+
+            <TextView
+                android:id="@+id/a2_timerTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/a2_timeTV" />
+
         </LinearLayout>
 
     </RelativeLayout>

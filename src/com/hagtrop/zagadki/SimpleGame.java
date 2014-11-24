@@ -41,7 +41,6 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	private BaseHelper baseHelper;
 	private Handler handler;
 	private MyTimer timer;
-	
 	private GameInfo gameInfo;
 	
 	@Override
@@ -242,7 +241,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 	
 	void showEndGameDialog(){
 		FragmentManager fManager = getSupportFragmentManager();
-		GameoverDialog gameoverDialog = new GameoverDialog();
+		GoodGameDialog gameoverDialog = new GoodGameDialog();
 		gameoverDialog.show(fManager, "gameover_dialog");
 	}
 	
@@ -351,7 +350,7 @@ public class SimpleGame extends FragmentActivity implements LoaderCallbacks<Curs
 		else if(dialogType.equals(TimeIsOverDialog.DIALOG_TYPE)){
 			endGame();
 		}
-		else if(dialogType.equals(GameoverDialog.DIALOG_TYPE)){
+		else if(dialogType.equals(GoodGameDialog.DIALOG_TYPE)){
 			//Возвращаемся в меню выбора типа игры
 			endGame();
 		}

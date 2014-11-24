@@ -64,7 +64,7 @@
     </TableRow>
 
     <CheckBox
-        android:id="@+id/a0_countdownChBx"
+        android:id="@+id/a0_timerChBx"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/a0_countdownChBx" />

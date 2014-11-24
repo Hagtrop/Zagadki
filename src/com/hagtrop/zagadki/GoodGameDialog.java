@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 
-public class GameoverDialog extends DialogFragment implements OnClickListener{
+public class GoodGameDialog extends DialogFragment implements OnClickListener{
 	public static final String DIALOG_TYPE = "Gameover Message";
 	NoticeDialogListener mListener;
 
@@ -53,7 +53,7 @@ public class GameoverDialog extends DialogFragment implements OnClickListener{
 	@Override
 	public void onDismiss(DialogInterface dialog) {
 		super.onDismiss(dialog);
-		mListener.onDialogDismiss(GameoverDialog.this, DIALOG_TYPE);
+		mListener.onDialogDismiss(GoodGameDialog.this, DIALOG_TYPE);
 	}
 
 	@Override

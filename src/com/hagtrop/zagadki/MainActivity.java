@@ -13,7 +13,7 @@ import android.widget.CheckBox;
 
 public class MainActivity extends Activity implements OnClickListener{
 	Button simpleBtn, variantsBtn, countdownBtn, sandsBtn;
-	CheckBox countdownChBx;
+	CheckBox timerChBx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class MainActivity extends Activity implements OnClickListener{
         sandsBtn = (Button) findViewById(R.id.a0_sandsBtn);
         sandsBtn.setOnClickListener(this);
         
-        countdownChBx = (CheckBox) findViewById(R.id.a0_countdownChBx);
+        timerChBx = (CheckBox) findViewById(R.id.a0_timerChBx);
         
         BaseHelper bh = BaseHelper.getInstance(this);
         bh.printData();
@@ -50,11 +50,13 @@ public class MainActivity extends Activity implements OnClickListener{
 		switch(v.getId()){
 		case R.id.a0_simpleBtn:
 			intent = new Intent(this, SimpleGame.class);
-			if(countdownChBx.isChecked()) intent.putExtra("timer", true);
+			if(timerChBx.isChecked()) intent.putExtra("timer", true);
 			startActivity(intent);
 			break;
 		case R.id.a0_variantsBtn:
-			startActivity(new Intent(this, TestGame.class));
+			intent = new Intent(this, TestGame.class);
+			if(timerChBx.isChecked()) intent.putExtra("timer", true);
+			startActivity(intent);
 			break;
 		case R.id.true_dialog:
 			break;
